@@ -12,3 +12,26 @@
 body {
   font-family: "Inter", sans-serif;
 }
+
+.text-gradient {
+  @apply bg-gradient-to-r from-[#4A6CF7] via-[#3BADE3] to-[#2CD4C6] text-transparent bg-clip-text;
+}
+
+.bg-gradient {
+  @apply bg-gradient-to-r from-[#4A6CF7] via-[#3BADE3] to-[#2CD4C6] text-white;
+}
+
+/* Animation */
+@keyframes hang {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+.animate-hang {
+  animation: hang 2s ease-in-out infinite;
+}
