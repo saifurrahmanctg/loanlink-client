@@ -1,0 +1,14 @@
+/* Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Rajdhani:wght@300;400;500;600;700&display=swap");
+
+/* Tailwind CSS & DaisyUI */
+@import "tailwindcss";
+@plugin "daisyui";
+
+.font-rajdhani {
+  font-family: "Rajdhani", sans-serif;
+}
+/* Global Styles */
+body {
+  font-family: "Inter", sans-serif;
+}
