@@ -1,9 +1,8 @@
-// src/components/Navbar.jsx
 import { Link, NavLink } from "react-router";
 import { useState, useEffect } from "react";
 import logo from "../assets/main-logo.png";
-import { IoMoon, IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
-import { FaMoon } from "react-icons/fa";
+import { IoMoon } from "react-icons/io5";
+
 import { MdSunny } from "react-icons/md";
 
 export default function Navbar({ isLoggedIn, user, onLogout }) {
@@ -73,11 +72,11 @@ export default function Navbar({ isLoggedIn, user, onLogout }) {
   );
 
   return (
-    <nav className="w-full fixed top-0 left-0 z-50 bg-base-100/90 backdrop-blur-md shadow-sm">
+    <nav className="w-full fixed top-0 left-0 z-50 bg-base-200 backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* LEFT --- LOGO */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/">
             <img src={logo} alt="Logo" className="h-10 w-auto" />
           </Link>
 

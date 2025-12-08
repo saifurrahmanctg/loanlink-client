@@ -10,7 +10,7 @@ export default function ErrorPage() {
       <div className="text-center max-w-md my-16">
         {/* Big 404 heading */}
         <img src={errorImg} alt="Error Image" className="animate-hang" />
-        <h1 className="text-6xl font-rajdhani font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4A6CF7] via-[#3BADE3] to-[#2CD4C6] my-8">
+        <h1 className="text-5xl font-rajdhani font-extrabold text-gradient my-8">
           404 Error
         </h1>
         {/* Short message */}
@@ -25,7 +25,7 @@ export default function ErrorPage() {
         {/* Button back home */}
         <Link
           to="/"
-          className="inline-block px-5 py-2.5 rounded font-medium bg-gradient-to-r from-[#4A6CF7] via-[#3BADE3] to-[#2CD4C6] text-white hover:opacity-90 transition"
+          className="inline-block px-5 py-2.5 rounded font-medium bg-gradient hover:opacity-90 transition"
         >
           Go Back Home
         </Link>

@@ -4,6 +4,7 @@ import RootLayout from "../Layouts/RootLayout";
 import ErrorPage from "../pages/ErrorPage";
 import HomePage from "../pages/HomePage";
 import Login from "../pages/Auth/Login";
+import Register from "../pages/Auth/Register";
 
 const RootRouter = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const RootRouter = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },
