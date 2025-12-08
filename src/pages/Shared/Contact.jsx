@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
 import { useForm } from "react-hook-form";
-import PageHeader from "../../Components/PageHeader";
+import PageHeader from "../../Components/Shared/PageHeader";
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },

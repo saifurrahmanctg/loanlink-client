@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useClickAway } from "react-use";
 import { IoMoon } from "react-icons/io5";
 import { MdSunny } from "react-icons/md";
-import logo from "../assets/main-logo.png";
-import { useAuth } from "../Provider/AuthProvider";
+import logo from "../../assets/main-logo.png";
+import { useAuth } from "../../Provider/AuthProvider";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);

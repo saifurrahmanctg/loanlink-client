@@ -1,6 +1,6 @@
 // src/components/ErrorPage.jsx
 import { Link } from "react-router";
-import PageHeader from "../Components/PageHeader";
+import PageHeader from "../Components/Shared/PageHeader";
 import errorImg from "../assets/error404.png";
 
 export default function ErrorPage() {

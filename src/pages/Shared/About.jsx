@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { FiTarget, FiZap, FiShield, FiUsers } from "react-icons/fi";
 import { Link } from "react-router";
-import PageHeader from "../../Components/PageHeader";
+import PageHeader from "../../Components/Shared/PageHeader";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },

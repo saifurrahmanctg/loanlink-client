@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import PageHeader from "../../Components/PageHeader";
+import PageHeader from "../../Components/Shared/PageHeader";
 import authImage from "../../assets/auth-image.jpg";
 import authBg from "../../assets/auth-bg.png";
 import authBgDark from "../../assets/auth-bg-dark.png";

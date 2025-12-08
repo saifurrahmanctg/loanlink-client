@@ -1,6 +1,6 @@
 // src/components/PageHeader.jsx
 import { Link } from "react-router";
-import headerImg from "../assets/page-header.jpg";
+import headerImg from "../../assets/page-header.jpg";
 import { FaGreaterThan } from "react-icons/fa6";
 
 export default function PageHeader({ title, subtitle }) {

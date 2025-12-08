@@ -1,8 +1,12 @@
 import React from "react";
-import Loader from "../Components/Loader";
+import HeroBanner from "../Components/HomePage/HeroBanner";
 
 const HomePage = () => {
-  return <div>Home Page</div>;
+  return (
+    <div className="bg-base-100">
+      <HeroBanner />
+    </div>
+  );
 };
 
 export default HomePage;

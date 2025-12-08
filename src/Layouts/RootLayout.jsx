@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../Components/Navbar";
+import Navbar from "../Components/Shared/Navbar";
 import { Outlet, useNavigation } from "react-router";
-import Footer from "../Components/Footer";
-import Loader from "../Components/Loader";
+import Footer from "../Components/Shared/Footer";
+import Loader from "../Components/Shared/Loader";
 
 const RootLayout = () => {
   const navigation = useNavigation();
