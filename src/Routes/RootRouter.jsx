@@ -5,6 +5,10 @@ import ErrorPage from "../pages/ErrorPage";
 import HomePage from "../pages/HomePage";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
+import About from "../pages/Shared/About";
+import Contact from "../pages/Shared/Contact";
+import AllLoans from "../pages/AllLoans";
+import DashboardLayout from "../Layouts/DashboardLayout";
 
 const RootRouter = createBrowserRouter([
   {
@@ -12,19 +16,17 @@ const RootRouter = createBrowserRouter([
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "register",
-        element: <Register />,
-      },
+      { index: true, element: <HomePage /> },
+      { path: "all-loans", element: <AllLoans /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "about", element: <About /> },
+      { path: "contact", element: <Contact /> },
     ],
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
   },
 ]);
 

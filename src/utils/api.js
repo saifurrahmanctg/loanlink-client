@@ -1,0 +1,15 @@
+import axios from "axios";
+import { getAuth } from "firebase/auth";
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
+
+/* attach Firebase ID token to every request */
+api.interceptors.request.use(async (config) => {
+  const token = await getAuth().currentUser?.getIdToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default api;
