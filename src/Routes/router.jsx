@@ -29,7 +29,19 @@ const router = createBrowserRouter([
         loader: () => fetch(`${API}/loans`),
         element: <AllLoans />,
       },
-      { path: "loan-details/:id", element: <LoanDetails /> },
+      {
+        path: "/loan-details/:id",
+        element: <LoanDetails />,
+        loader: async ({ params }) => {
+          const allLoans = await fetch(`${API}/loans`).then((res) =>
+            res.json()
+          );
+          const loan = allLoans.find((l) => l._id === params.id);
+
+          return { loan, allLoans };
+        },
+      },
+
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "about", element: <About /> },

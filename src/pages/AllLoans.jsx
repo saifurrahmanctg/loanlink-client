@@ -1,4 +1,3 @@
-/* AllLoans.jsx */
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLoaderData } from "react-router";
@@ -17,39 +16,48 @@ export default function AllLoans() {
   const [amountMax, setAmountMax] = useState(100000);
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  /* ---------- derived data ---------- */
+  /* ---------- loader data ---------- */
   const loanData = useLoaderData() || [];
+
+  /* ---------- derived categories ---------- */
   const categories = useMemo(
     () => ["", ...new Set(loanData.map((l) => l["Loan Category"]))],
-    []
+    [loanData]
   );
 
+  /* ---------- filtering logic ---------- */
   const filtered = useMemo(() => {
     return loanData.filter((l) => {
+      const title = l["Loan Title"]?.toLowerCase() || "";
+      const category = l["Loan Category"]?.toLowerCase() || "";
+
       const matchesSearch =
-        l["Loan Title"].toLowerCase().includes(search.toLowerCase()) ||
-        l["Loan Category"].toLowerCase().includes(search.toLowerCase());
+        title.includes(search.toLowerCase()) ||
+        category.includes(search.toLowerCase());
+
       const matchesInterest = l.Interest <= interestMax;
       const matchesAmount = l["Max Loan Limit"] <= amountMax;
+
       const matchesCategory =
         !selectedCategory || l["Loan Category"] === selectedCategory;
+
       return (
         matchesSearch && matchesInterest && matchesAmount && matchesCategory
       );
     });
-  }, [search, interestMax, amountMax, selectedCategory]);
+  }, [search, interestMax, amountMax, selectedCategory, loanData]);
 
   /* ---------- handlers ---------- */
   const clearAll = () => {
     setSearch("");
     setInterestMax(15);
-    setAmountMax(200000);
+    setAmountMax(100000);
     setSelectedCategory("");
   };
 
   return (
     <>
-      {/* -------------  PageHeader animates from top ------------- */}
+      {/* Page Header */}
       <motion.div
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -57,6 +65,7 @@ export default function AllLoans() {
       >
         <PageHeader title="All Loans" />
       </motion.div>
+
       <section className="py-16 px-6 bg-base-100">
         <div className="max-w-7xl mx-auto">
           {/* Heading */}
@@ -75,7 +84,7 @@ export default function AllLoans() {
             </p>
           </motion.div>
 
-          {/* ----------  FILTER BAR  ---------- */}
+          {/* FILTER BAR */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -94,6 +103,7 @@ export default function AllLoans() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+
             {/* Category + Clear */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
@@ -119,7 +129,7 @@ export default function AllLoans() {
             </div>
 
             {/* Interest Slider */}
-            <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-1.5 py-1">
+            <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-2 py-1">
               <label className="label">
                 <span className="text-gradient">Interest:</span>
                 <span className="label-text">5%</span>
@@ -139,10 +149,10 @@ export default function AllLoans() {
             </div>
 
             {/* Amount Slider */}
-            <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-1.5 py-1">
+            <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-2 py-1">
               <label className="label">
                 <span className="text-gradient">Amount:</span>
-                <span className="label-text">৳ 5000</span>
+                <span className="label-text">৳ 5,000</span>
               </label>
               <input
                 type="range"
@@ -176,6 +186,7 @@ export default function AllLoans() {
               </span>{" "}
               loan(s)
             </p>
+
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <FaFilter className="text-primary" />
               <span>
@@ -192,12 +203,12 @@ export default function AllLoans() {
             </div>
           </motion.div>
 
-          {/* ----------  LOAN CARDS  ---------- */}
+          {/* Loan Cards */}
           <AnimatePresence mode="popLayout">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((loan, i) => (
                 <motion.div
-                  key={loan["Loan Title"]}
+                  key={loan._id}
                   layout
                   initial="hidden"
                   whileInView="visible"
@@ -212,22 +223,26 @@ export default function AllLoans() {
                       className="w-full h-full object-cover"
                     />
                   </figure>
+
                   <div className="card-body p-4">
                     <h3 className="card-title text-lg">{loan["Loan Title"]}</h3>
                     <p className="text-sm text-gray-500 mb-1">
                       {loan["Loan Category"]}
                     </p>
+
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-primary font-semibold">
                         {loan.Interest}% interest
                       </span>
+
                       <span className="text-gray-600">
-                        Up to ৳{loan["Max Loan Limit"].toLocaleString()}
+                        Up to ৳{loan["Max Loan Limit"]?.toLocaleString()}
                       </span>
                     </div>
+
                     <div className="card-actions mt-4">
                       <Link
-                        to={`/loan-details/${loan.id}`}
+                        to={`/loan-details/${loan._id}`}
                         className="btn bg-gradient btn-sm btn-block"
                       >
                         View Details
