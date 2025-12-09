@@ -143,14 +143,14 @@ export default function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-4">
+            {ThemeButton}
             {user ? (
               <AvatarDropdown />
             ) : (
-              <NavLink to="/login" className="login-btn">
+              <NavLink to="/login" className="btn bg-gradient rounded">
                 Login
               </NavLink>
             )}
-            {ThemeButton}
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export default function Navbar() {
             {user ? (
               <AvatarDropdown />
             ) : (
-              <NavLink to="/login" className="login-btn">
+              <NavLink to="/login" className="btn bg-gradient rounded">
                 Login
               </NavLink>
             )}

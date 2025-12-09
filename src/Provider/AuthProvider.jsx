@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /* ---------- actions ---------- */
-  const signUp = async (email, password, name, photoURL) => {
+  const signUp = async (email, password, name, photoURL, role) => {
     setLoading(true);
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -77,6 +77,7 @@ export const AuthProvider = ({ children }) => {
         email,
         displayName: name,
         photoURL,
+        role,
         token,
       };
       setUser(profile);

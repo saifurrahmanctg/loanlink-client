@@ -52,6 +52,11 @@ const floatVariants = {
 
 /* ------------- page component ------------- */
 export default function Register() {
+  const [role, setRole] = useState("borrower");
+  const roleOptions = [
+    { value: "borrower", label: "Borrower" },
+    { value: "manager", label: "Manager" },
+  ];
   const {
     register: hookFormRegister,
     handleSubmit,
@@ -100,9 +105,9 @@ export default function Register() {
   };
 
   /* ---------- Firebase register ---------- */
-  const onSubmit = async ({ name, email, password, photo }) => {
+  const onSubmit = async ({ name, email, password, photo, role }) => {
     try {
-      await signUp(email, password, name, photo);
+      await signUp(email, password, name, photo, role);
       MySwal.fire({
         icon: "success",
         title: "Account created!",
@@ -245,44 +250,75 @@ export default function Register() {
                   )}
                 </motion.div>
 
-                {/* Photo */}
-                <motion.div custom={4} variants={fadeInVariants}>
-                  <label className="block mb-1 font-semibold">
-                    Profile Photo
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <label
-                      htmlFor="photo-upload"
-                      className="cursor-pointer flex items-center gap-2 btn btn-outline btn-sm normal-case"
-                    >
-                      <BsUpload /> {uploading ? "Uploading…" : "Choose image"}
+                {/* Photo + Role Row */}
+                <motion.div
+                  custom={4}
+                  variants={fadeInVariants}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  {/* LEFT - Photo Upload (unchanged) */}
+                  <div>
+                    <label className="block mb-1 font-semibold">
+                      Profile Photo
                     </label>
-                    <input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={onSelectFile}
-                    />
-                    {preview && (
-                      <img
-                        src={preview}
-                        alt="preview"
-                        className="w-14 h-14 rounded object-cover shadow"
+                    <div className="flex items-center gap-4">
+                      <label
+                        htmlFor="photo-upload"
+                        className="cursor-pointer flex items-center gap-2 btn btn-outline btn-sm normal-case"
+                      >
+                        <BsUpload /> {uploading ? "Uploading…" : "Choose image"}
+                      </label>
+                      <input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={onSelectFile}
                       />
+                      {preview && (
+                        <img
+                          src={preview}
+                          alt="preview"
+                          className="w-14 h-14 rounded object-cover shadow"
+                        />
+                      )}
+                    </div>
+                    <input
+                      type="hidden"
+                      {...hookFormRegister("photo", {
+                        required: "Please upload a photo",
+                      })}
+                    />
+                    {errors.photo && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.photo.message}
+                      </p>
                     )}
                   </div>
-                  <input
-                    type="hidden"
-                    {...hookFormRegister("photo", {
-                      required: "Please upload a photo",
-                    })}
-                  />
-                  {errors.photo && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.photo.message}
-                    </p>
-                  )}
+
+                  {/* RIGHT - Role Dropdown (NEW) */}
+                  <div>
+                    <label className="block mb-1 font-semibold">Role</label>
+                    <select
+                      className="select select-bordered w-full rounded"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      {...hookFormRegister("role", {
+                        required: "Please select a role",
+                      })}
+                    >
+                      {roleOptions.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.role && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.role.message}
+                      </p>
+                    )}
+                  </div>
                 </motion.div>
 
                 {/* Email */}

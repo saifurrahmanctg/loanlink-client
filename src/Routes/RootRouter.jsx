@@ -9,6 +9,7 @@ import About from "../pages/Shared/About";
 import Contact from "../pages/Shared/Contact";
 import AllLoans from "../pages/AllLoans";
 import DashboardLayout from "../Layouts/DashboardLayout";
+import LoanDetails from "../pages/LoanDetails";
 
 const RootRouter = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ const RootRouter = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "all-loans", element: <AllLoans /> },
+      { path: "loan-details/:id", element: <LoanDetails /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "about", element: <About /> },

@@ -1,4 +1,3 @@
-/* Login.jsx */
 import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
