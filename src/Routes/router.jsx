@@ -11,7 +11,7 @@ import AllLoans from "../pages/AllLoans";
 import DashboardLayout from "../Layouts/DashboardLayout";
 import LoanDetails from "../pages/LoanDetails";
 
-const RootRouter = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
@@ -32,4 +32,4 @@ const RootRouter = createBrowserRouter([
   },
 ]);
 
-export default RootRouter;
+export default router;
