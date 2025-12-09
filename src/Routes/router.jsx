@@ -10,6 +10,10 @@ import Contact from "../pages/Shared/Contact";
 import AllLoans from "../pages/AllLoans";
 import DashboardLayout from "../Layouts/DashboardLayout";
 import LoanDetails from "../pages/LoanDetails";
+import MyLoans from "../pages/DashboardPages/User/MyLoans";
+import Profile from "../pages/DashboardPages/User/Profile";
+import Settings from "../pages/DashboardPages/User/Settings";
+import DashboardHome from "../pages/DashboardPages/DashboardHome";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +33,12 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <DashboardLayout />,
+    children: [
+      { index: true, element: <DashboardHome /> },
+      { path: "/dashboard/my-loans", element: <MyLoans /> },
+      { path: "/dashboard/profile", element: <Profile /> },
+      { path: "/dashboard/settings", element: <Settings /> },
+    ],
   },
 ]);
 

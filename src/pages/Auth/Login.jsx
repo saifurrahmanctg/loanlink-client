@@ -158,9 +158,7 @@ export default function Login() {
                 <div>
                   <h2 className="font-rajdhani text-3xl font-bold mb-2">
                     Welcome Back to{" "}
-                    <span className="text-transparent bg-clip-text bg-gradient">
-                      LoanLink
-                    </span>
+                    <span className="text-gradient">LoanLink</span>
                   </h2>
                   <p className="text-gray-500">
                     Sign in to access your microloan dashboard
