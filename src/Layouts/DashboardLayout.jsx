@@ -1,20 +1,13 @@
 import { Outlet, Link, useLocation } from "react-router";
 import { motion } from "framer-motion";
 import { FaHome, FaWallet, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
-import { IoMoon, IoSunny } from "react-icons/io5";
 import { useAuth } from "../Provider/AuthProvider";
 import logo from "../assets/main-logo.png";
-import { useState } from "react";
 
 export default function DashboardLayout() {
   const { user, logOut } = useAuth();
+
   const location = useLocation();
-  const [theme, setTheme] = useState("light");
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-  };
 
   const menuItems = [
     { label: "Home", path: "/dashboard", icon: <FaHome /> },
@@ -26,7 +19,7 @@ export default function DashboardLayout() {
     { label: "Settings", path: "/dashboard/settings", icon: <FaCog /> },
   ];
 
-  const initial = user?.displayName?.charAt(0) || user?.email?.charAt(0) || "?";
+  const userPhoto = user?.photoURL || "?";
 
   /* ---------- SIDE BAR CONTENT ---------- */
   const SideBar = ({ onClose }) => (
@@ -127,7 +120,11 @@ export default function DashboardLayout() {
 
           {/* FOOTER */}
           <footer className="bg-base-300 px-6 py-4 text-center text-sm text-gray-600">
-            © {new Date().getFullYear()} LoanLink. All rights reserved.
+            © {new Date().getFullYear()}{" "}
+            <span className="text-gradient text-lg font-bold font-rajdhani">
+              LoanLink
+            </span>
+            . All rights reserved.
           </footer>
         </div>
 
@@ -158,16 +155,13 @@ export default function DashboardLayout() {
               "Dashboard"}
           </h1>
           <div className="flex items-center gap-3">
-            <button onClick={toggleTheme} className="btn btn-ghost btn-circle">
-              {theme === "light" ? <IoMoon /> : <IoSunny />}
-            </button>
-            <div className="w-9 h-9 rounded-full bg-gradient text-white grid place-items-center font-bold">
-              {initial}
-            </div>
+            <Link to="/dashboard/profile">
+              <img src={userPhoto} alt="" className="w-10 rounded" />
+            </Link>
           </div>
         </nav>
 
-        <main className="flex-1 flex-grow">
+        <main className="flex-grow">
           <Outlet />
         </main>
 

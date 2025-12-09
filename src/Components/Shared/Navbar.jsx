@@ -48,7 +48,7 @@ export default function Navbar() {
             <img
               src={user.photoURL}
               alt="avatar"
-              className="w-9 h-9 rounded-full object-cover"
+              className="w-9 h-9 rounded object-cover"
             />
           ) : (
             <div className="w-9 h-9 rounded-full bg-gradient text-white grid place-items-center font-bold">

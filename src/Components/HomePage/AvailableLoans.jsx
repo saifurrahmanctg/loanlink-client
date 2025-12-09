@@ -1,16 +1,45 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router";
-import { loanData } from "../../data/loanData";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
-const hoverLift = { whileHover: { y: -6, transition: { duration: 0.2 } } };
+
+const hoverLift = {
+  whileHover: { y: -6, transition: { duration: 0.2 } },
+};
+
+const API = import.meta.env.VITE_API_URL;
 
 export default function AvailableLoans() {
-  // pick first 6 loans for home page
-  const homeLoans = loanData.slice(0, 6);
+  const [loans, setLoans] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch loans from API
+  useEffect(() => {
+    fetch(`${API}/loans`)
+      .then((res) => res.json())
+      .then((data) => {
+        setLoans(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error loading loans:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  const availableLoans = loans.slice(0, 6);
 
   return (
     <section className="py-20 px-6 bg-base-300">
@@ -31,11 +60,11 @@ export default function AvailableLoans() {
           </p>
         </motion.div>
 
-        {/* 6 Cards Grid */}
+        {/* Loan Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {homeLoans.map((loan, i) => (
+          {availableLoans.map((loan, i) => (
             <motion.div
-              key={loan["Loan Title"]}
+              key={loan.id}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
@@ -54,17 +83,21 @@ export default function AvailableLoans() {
 
               <div className="card-body p-5">
                 <h3 className="card-title text-lg">{loan["Loan Title"]}</h3>
+
                 <p className="text-sm text-gray-500 mb-1">
                   {loan["Loan Category"]}
                 </p>
+
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-primary font-semibold">
                     {loan.Interest}% interest
                   </span>
+
                   <span className="text-gray-600">
-                    Up to ₹{loan["Max Loan Limit"].toLocaleString()}
+                    Up to ৳{loan["Max Loan Limit"]?.toLocaleString()}
                   </span>
                 </div>
+
                 <div className="card-actions mt-4">
                   <Link
                     to={`loan-details/${loan.id}`}
@@ -78,7 +111,7 @@ export default function AvailableLoans() {
           ))}
         </div>
 
-        {/* CTA to full catalogue */}
+        {/* CTA */}
         <motion.div
           initial="hidden"
           whileInView="visible"

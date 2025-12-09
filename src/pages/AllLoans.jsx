@@ -1,8 +1,7 @@
 /* AllLoans.jsx */
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router";
-import { loanData } from "../data/loanData";
+import { Link, useLoaderData } from "react-router";
 import { FaSearch, FaFilter, FaTimes } from "react-icons/fa";
 import PageHeader from "../Components/Shared/PageHeader";
 
@@ -19,6 +18,7 @@ export default function AllLoans() {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   /* ---------- derived data ---------- */
+  const loanData = useLoaderData() || [];
   const categories = useMemo(
     () => ["", ...new Set(loanData.map((l) => l["Loan Category"]))],
     []
