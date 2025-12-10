@@ -14,6 +14,7 @@ import MyLoans from "../pages/DashboardPages/User/MyLoans";
 import Profile from "../pages/DashboardPages/User/Profile";
 import Settings from "../pages/DashboardPages/User/Settings";
 import DashboardHome from "../pages/DashboardPages/DashboardHome";
+import ApplyLoan from "../pages/ApplyLoan";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -39,6 +40,17 @@ const router = createBrowserRouter([
           const loan = allLoans.find((l) => l._id === params.id);
 
           return { loan, allLoans };
+        },
+      },
+      {
+        path: "/apply-loan/:id",
+        element: <ApplyLoan />,
+        loader: async ({ params }) => {
+          const loan = await fetch(`${API}/loans/${params.id}`).then((res) =>
+            res.json()
+          );
+
+          return { loan };
         },
       },
 
