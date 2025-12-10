@@ -17,6 +17,8 @@ import DashboardHome from "../pages/DashboardPages/DashboardHome";
 import ApplyLoan from "../pages/ApplyLoan";
 import LoanApplications from "../pages/Admin/LoanApplications";
 import AddLoan from "../pages/Manager/AddLoan";
+import RoleRoute from "./RoleRoute";
+import AccessDenied from "../pages/AccessDenied";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -46,7 +48,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/apply-loan/:id",
-        element: <ApplyLoan />,
+        element: (
+          <RoleRoute allowedRoles={["admin", "manager", "borrower"]}>
+            <ApplyLoan />
+          </RoleRoute>
+        ),
         loader: async ({ params }) => {
           const loan = await fetch(`${API}/loans/${params.id}`).then((res) =>
             res.json()
@@ -62,14 +68,40 @@ const router = createBrowserRouter([
       { path: "contact", element: <Contact /> },
     ],
   },
+  { path: "/access-denied", element: <AccessDenied /> },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <RoleRoute allowedRoles={["admin", "manager", "borrower"]}>
+        <DashboardLayout />
+      </RoleRoute>
+    ),
     children: [
       { index: true, element: <DashboardHome /> },
-      { path: "/dashboard/my-loans", element: <MyLoans /> },
-      { path: "add-loan", element: <AddLoan /> },
-      { path: "/dashboard/loan-applications", element: <LoanApplications /> },
+      {
+        path: "/dashboard/my-loans",
+        element: (
+          <RoleRoute allowedRoles={["borrower"]}>
+            <MyLoans />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "add-loan",
+        element: (
+          <RoleRoute allowedRoles={["manager"]}>
+            <AddLoan />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/dashboard/loan-applications",
+        element: (
+          <RoleRoute allowedRoles={["admin"]}>
+            <LoanApplications />
+          </RoleRoute>
+        ),
+      },
       { path: "/dashboard/profile", element: <Profile /> },
       { path: "/dashboard/settings", element: <Settings /> },
     ],

@@ -28,6 +28,19 @@ const toast = (icon, title) =>
     timer: 3000,
   });
 
+/* ---------- helper: fetch user from MongoDB ---------- */
+const fetchUserFromDB = async (email) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/users/${email}`);
+    if (!res.ok) throw new Error("Failed to fetch user data from DB");
+    const dbUser = await res.json();
+    return dbUser; // Expected: { email, role, ... }
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,11 +59,14 @@ export const AuthProvider = ({ children }) => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         const token = await fbUser.getIdToken();
+        const dbUser = await fetchUserFromDB(fbUser.email);
+
         const profile = {
           uid: fbUser.uid,
           email: fbUser.email,
           displayName: fbUser.displayName,
           photoURL: fbUser.photoURL,
+          role: dbUser?.role || "borrower", // fallback role
           token,
         };
         setUser(profile);
@@ -61,15 +77,19 @@ export const AuthProvider = ({ children }) => {
       }
       setLoading(false);
     });
+
     return unsub;
   }, []);
 
   /* ---------- actions ---------- */
-  const signUp = async (email, password, name, photoURL, role) => {
+  const signUp = async (email, password, name, photoURL) => {
     setLoading(true);
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(cred.user, { displayName: name, photoURL });
+
+      // Fetch user from DB to get role
+      const dbUser = await fetchUserFromDB(email);
 
       const token = await cred.user.getIdToken();
       const profile = {
@@ -77,7 +97,7 @@ export const AuthProvider = ({ children }) => {
         email,
         displayName: name,
         photoURL,
-        role,
+        role: dbUser?.role || "borrower", // fallback role
         token,
       };
       setUser(profile);
@@ -97,11 +117,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       const token = await cred.user.getIdToken();
+
+      const dbUser = await fetchUserFromDB(email);
+
       const profile = {
         uid: cred.user.uid,
         email,
         displayName: cred.user.displayName,
         photoURL: cred.user.photoURL,
+        role: dbUser?.role || "borrower",
         token,
       };
       setUser(profile);
@@ -121,11 +145,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const cred = await signInWithPopup(auth, googleProvider);
       const token = await cred.user.getIdToken();
+
+      const dbUser = await fetchUserFromDB(cred.user.email);
+
       const profile = {
         uid: cred.user.uid,
         email: cred.user.email,
         displayName: cred.user.displayName,
         photoURL: cred.user.photoURL,
+        role: dbUser?.role || "borrower",
         token,
       };
       setUser(profile);

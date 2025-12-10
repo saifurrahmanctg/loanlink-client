@@ -32,7 +32,7 @@ const useDaisyTheme = () => {
   return theme;
 };
 
-/* ------------- animation variants (unchanged) ------------- */
+/* ---------- animation variants  ---------- */
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i = 1) => ({
@@ -55,17 +55,29 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-  const { login, signInWithGoogle } = useAuth(); // ← Firebase hooks
+  const { login, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
-
-  /* 🎯 live theme */
   const theme = useDaisyTheme();
   const bgImage = theme === "dark" ? authBgDark : authBg;
 
-  /* ---------- Firebase email login ---------- */
+  /* ---------- Email/Password login ---------- */
   const onSubmit = async ({ email, password }) => {
     try {
-      await login(email, password);
+      const user = await login(email, password);
+
+      // Save to MongoDB
+      await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "No Name",
+          email: user.email,
+          photo: user.photoURL || "",
+          role: "borrower", // default
+          createdAt: new Date(),
+        }),
+      });
+
       MySwal.fire({
         icon: "success",
         title: "Welcome back!",
@@ -74,18 +86,27 @@ export default function Login() {
       });
       navigate("/dashboard");
     } catch (err) {
-      MySwal.fire({
-        icon: "error",
-        title: "Login failed",
-        text: err.message,
-      });
+      MySwal.fire({ icon: "error", title: "Login failed", text: err.message });
     }
   };
 
-  /* ---------- Firebase Google login ---------- */
+  /* ---------- Google login ---------- */
   const googleLogin = async () => {
     try {
-      await signInWithGoogle();
+      const user = await signInWithGoogle();
+
+      await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "No Name",
+          email: user.email,
+          photo: user.photoURL || "",
+          role: "borrower", // default role
+          createdAt: new Date(),
+        }),
+      });
+
       MySwal.fire({
         icon: "success",
         title: "Signed in with Google!",
@@ -96,7 +117,7 @@ export default function Login() {
     } catch (err) {
       MySwal.fire({
         icon: "error",
-        title: "Google sign-in failed",
+        title: "Google login failed",
         text: err.message,
       });
     }

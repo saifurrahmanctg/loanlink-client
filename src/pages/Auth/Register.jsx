@@ -141,22 +141,20 @@ export default function Register() {
     }
   };
 
-  /* ---------- social register ---------- */
+  /* ---------- Google register ---------- */
   const googleRegister = async () => {
     try {
-      // 1️⃣ Sign in with Google (Firebase)
-      const result = await signInWithGoogle();
-      const user = result.user;
+      const user = await signInWithGoogle();
 
-      // 2️⃣ Save into MongoDB
+      // Save to MongoDB
       await fetch(`${import.meta.env.VITE_API_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: user.displayName,
+          name: user.displayName || "No Name",
           email: user.email,
-          photo: user.photoURL, // google profile photo
-          role: "borrower", // default or let user choose
+          photo: user.photoURL || "",
+          role: "borrower", // default role
           createdAt: new Date(),
         }),
       });
@@ -164,11 +162,9 @@ export default function Register() {
       MySwal.fire({
         icon: "success",
         title: "Signed up with Google!",
-        text: "Account saved in database",
         timer: 2000,
         showConfirmButton: false,
       });
-
       navigate("/dashboard");
     } catch (err) {
       MySwal.fire({

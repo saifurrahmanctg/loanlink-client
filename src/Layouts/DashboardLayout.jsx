@@ -17,19 +17,45 @@ export default function DashboardLayout() {
   const location = useLocation();
 
   const menuItems = [
-    { label: "Home", path: "/dashboard", icon: <FaHome /> },
-    { label: "My Loans", path: "/dashboard/my-loans", icon: <FaWallet /> },
-    { label: "Add Loan", path: "/dashboard/add-loan", icon: <FaPlusCircle /> },
+    {
+      label: "Home",
+      path: "/dashboard",
+      icon: <FaHome />,
+      roles: ["admin", "manager", "borrower"],
+    },
+    {
+      label: "My Loans",
+      path: "/dashboard/my-loans",
+      icon: <FaWallet />,
+      roles: ["borrower"],
+    },
+    {
+      label: "Add Loan",
+      path: "/dashboard/add-loan",
+      icon: <FaPlusCircle />,
+      roles: ["manager"],
+    },
     {
       label: "Loan Applications",
       path: "/dashboard/loan-applications",
       icon: <FaFileAlt />,
+      roles: ["admin"],
     },
   ];
 
   const userMenu = [
-    { label: "Profile", path: "/dashboard/profile", icon: <FaUser /> },
-    { label: "Settings", path: "/dashboard/settings", icon: <FaCog /> },
+    {
+      label: "Profile",
+      path: "/dashboard/profile",
+      icon: <FaUser />,
+      roles: ["admin", "manager", "borrower"],
+    },
+    {
+      label: "Settings",
+      path: "/dashboard/settings",
+      icon: <FaCog />,
+      roles: ["admin", "manager", "borrower"],
+    },
   ];
 
   const userPhoto = user?.photoURL || "?";
@@ -41,35 +67,15 @@ export default function DashboardLayout() {
         <img src={logo} alt="Logo" className="h-8" />
       </Link>
 
-      {/* Menu */}
+      {/* Role Based Menu */}
       <ul className="menu space-y-2 flex-1 w-full">
-        {menuItems.map((item) => (
-          <li key={item.path}>
-            <Link
-              to={item.path}
-              className={`flex items-center gap-3 px-3 py-2 bg-gray-700 text-gray-200 rounded transition ${
-                location.pathname === item.path
-                  ? "active bg-gradient"
-                  : "hover:bg-blue-500"
-              }`}
-              onClick={onClose}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      {/* Logout */}
-      <div className="mt-auto border-t">
-        {/* Menu */}
-        <ul className="menu space-y-2 flex-1 w-full">
-          {userMenu.map((item) => (
+        {menuItems
+          .filter((item) => item.roles.includes(user?.role))
+          .map((item) => (
             <li key={item.path}>
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded bg-gray-700 text-gray-200 transition ${
+                className={`flex items-center gap-3 px-3 py-2 rounded transition ${
                   location.pathname === item.path
                     ? "active bg-gradient"
                     : "hover:bg-blue-500"
@@ -81,7 +87,31 @@ export default function DashboardLayout() {
               </Link>
             </li>
           ))}
+      </ul>
+
+      <div className="mt-auto border-t">
+        {/* User Menu */}
+        <ul className="menu space-y-2 flex-1 w-full mt-4">
+          {userMenu
+            .filter((item) => item.roles.includes(user?.role))
+            .map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2 rounded transition ${
+                    location.pathname === item.path
+                      ? "active bg-gradient"
+                      : "hover:bg-blue-500"
+                  }`}
+                  onClick={onClose}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              </li>
+            ))}
         </ul>
+        {/* Logout */}
         <button onClick={logOut} className="btn bg-red-600 w-full">
           <FaSignOutAlt /> Logout
         </button>
