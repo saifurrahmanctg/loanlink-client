@@ -17,38 +17,36 @@ const stats = [
 
 const team = [
   {
-    name: "Ananya Rao",
+    name: "Fowzia Hasan Chowdhury",
     role: "Co-Founder & CEO",
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
+    img: "https://i.ibb.co.com/7xYPDGKX/FOWZIA-HASAN-CHOWDHURY-2018.jpg",
   },
   {
-    name: "Vikram Malhotra",
+    name: "Saifur Rahman Chowdhury",
     role: "Co-Founder & CTO",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+    img: "https://i.ibb.co.com/5XVNTbL9/saifu-saif.jpg",
   },
   {
-    name: "Priya Nair",
+    name: "Nadimul Hasan Chowdhury",
     role: "Head of Risk",
-    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80",
+    img: "https://i.ibb.co.com/jZM43cZ7/NADIM-PHOTO.jpg",
   },
 ];
 
 export default function About() {
   return (
     <div className="bg-base-100">
-      {/* HERO */}
+      {/* Page Header */}
       <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeUp}
-        className="  text-center"
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <PageHeader title="About Us" />
       </motion.section>
 
       {/* STATS */}
-      <section className="px-6 py-16 bg-base-200">
+      <section className="px-6 py-16 bg-base-300">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s, i) => (
             <motion.div
@@ -58,7 +56,7 @@ export default function About() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
             >
-              <div className="text-4xl font-bold font-rajdhani text-primary">
+              <div className="text-4xl font-bold font-rajdhani text-gradient">
                 {s.value}
               </div>
               <div className="text-sm text-gray-500">{s.label}</div>
@@ -74,7 +72,7 @@ export default function About() {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          className="flex flex-col items-center text-center"
+          className=" flex flex-col items-center text-center"
         >
           <FiTarget className="w-10 h-10 text-primary mb-4" />
           <h3 className="text-xl font-semibold mb-2">Our Mission</h3>
@@ -116,7 +114,7 @@ export default function About() {
       </section>
 
       {/* TEAM */}
-      <section className="px-6 py-24 bg-base-200">
+      <section className="px-6 py-24 bg-base-300">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

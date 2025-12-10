@@ -1,4 +1,3 @@
-// src/components/PageHeader.jsx
 import { Link } from "react-router";
 import headerImg from "../../assets/page-header.jpg";
 import { FaGreaterThan } from "react-icons/fa6";
@@ -6,7 +5,7 @@ import { FaGreaterThan } from "react-icons/fa6";
 export default function PageHeader({ title, subtitle }) {
   return (
     <div
-      className="relative w-full h-60 md:h-72 flex items-center justify-center"
+      className="relative w-full h-40 md:h-60 flex items-center justify-center"
       style={{
         backgroundImage: `url(${headerImg})`,
         backgroundSize: "cover",
@@ -18,7 +17,7 @@ export default function PageHeader({ title, subtitle }) {
 
       {/* Content */}
       <div className="relative z-10 text-center text-white">
-        <h1 className="font-rajdhani text-4xl md:text-5xl font-bold">
+        <h1 className="font-rajdhani text-3xl md:text-5xl font-bold">
           {title}
         </h1>
 

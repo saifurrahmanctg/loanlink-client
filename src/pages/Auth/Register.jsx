@@ -107,14 +107,30 @@ export default function Register() {
   /* ---------- Firebase register ---------- */
   const onSubmit = async ({ name, email, password, photo, role }) => {
     try {
+      // Firebase auth create user
       await signUp(email, password, name, photo, role);
+
+      // Save to MongoDB
+      await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          photo,
+          role,
+          createdAt: new Date(),
+        }),
+      });
+
       MySwal.fire({
         icon: "success",
         title: "Account created!",
-        text: "Welcome to LoanLink",
+        text: "User saved in MongoDB successfully",
         timer: 2000,
         showConfirmButton: false,
       });
+
       navigate("/dashboard");
     } catch (err) {
       MySwal.fire({
@@ -128,13 +144,31 @@ export default function Register() {
   /* ---------- social register ---------- */
   const googleRegister = async () => {
     try {
-      await signInWithGoogle();
+      // 1️⃣ Sign in with Google (Firebase)
+      const result = await signInWithGoogle();
+      const user = result.user;
+
+      // 2️⃣ Save into MongoDB
+      await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL, // google profile photo
+          role: "borrower", // default or let user choose
+          createdAt: new Date(),
+        }),
+      });
+
       MySwal.fire({
         icon: "success",
         title: "Signed up with Google!",
+        text: "Account saved in database",
         timer: 2000,
         showConfirmButton: false,
       });
+
       navigate("/dashboard");
     } catch (err) {
       MySwal.fire({

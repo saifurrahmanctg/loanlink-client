@@ -48,7 +48,7 @@ export default function Navbar() {
             <img
               src={user.photoURL}
               alt="avatar"
-              className="w-9 h-9 rounded object-cover"
+              className="w-9 h-9 rounded-xl object-cover"
             />
           ) : (
             <div className="w-9 h-9 rounded-full bg-gradient text-white grid place-items-center font-bold">
@@ -90,22 +90,12 @@ export default function Navbar() {
   };
 
   /* ---------- Navigation Links ---------- */
-  const navLinks = (
-    <>
-      <NavLink to="/" className="nav-link">
-        Home
-      </NavLink>
-      <NavLink to="/all-loans" className="nav-link">
-        All Loans
-      </NavLink>
-      <NavLink to="/about" className="nav-link">
-        About Us
-      </NavLink>
-      <NavLink to="/contact" className="nav-link">
-        Contact Us
-      </NavLink>
-    </>
-  );
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "All Loans", path: "/all-loans" },
+    { name: "About Us", path: "/about" },
+    { name: "Contact Us", path: "/contact" },
+  ];
 
   /* ---------- Theme Button Component ---------- */
   const ThemeButton = (
@@ -129,7 +119,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="navbar-container bg-base-200 shadow-lg">
+    <nav className="navbar-container bg-base-300 shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         {/* ---------- DESKTOP NAV ---------- */}
         <div className="hidden md:flex items-center justify-between h-16">
@@ -139,7 +129,21 @@ export default function Navbar() {
           </Link>
 
           {/* Links */}
-          <div className="flex space-x-6 text-[#4A6CF7]">{navLinks}</div>
+          <div className="flex space-x-6 text-[#4A6CF7]">
+            {navLinks.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.path}
+                className={({ isActive }) =>
+                  ` transition-all duration-300 text-blue-700 ${
+                    isActive ? "font-bold border-b-3" : ""
+                  }`
+                }
+              >
+                {item.name}
+              </NavLink>
+            ))}
+          </div>
 
           {/* Right Section */}
           <div className="flex items-center gap-4">
@@ -204,7 +208,19 @@ export default function Navbar() {
             className="md:hidden bg-base-100 px-4 pb-4"
           >
             <div className="flex flex-col space-y-3 text-[#4A6CF7]">
-              {navLinks}
+              {navLinks.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    ` transition-all duration-300 text-blue-700 ${
+                      isActive ? "font-bold border-b-3" : ""
+                    }`
+                  }
+                >
+                  {item.name}
+                </NavLink>
+              ))}
             </div>
           </motion.div>
         )}

@@ -12,7 +12,7 @@ const slides = [
     title: "Fast Micro-Loans, Fair Terms",
     desc: "Get approved in minutes and access funds instantly with LoanLink’s transparent, data-driven lending.",
     cta: "Apply for Loan",
-    link: "/apply-loan",
+    link: "/login",
   },
   {
     img: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1920&q=80",
@@ -26,7 +26,7 @@ const slides = [
     title: "Zero Paperwork, 100% Digital",
     desc: "Upload documents once, reuse forever. LoanLink keeps everything secure and seamless.",
     cta: "Get Started",
-    link: "/apply-loan",
+    link: "/register",
   },
 ];
 

@@ -30,7 +30,7 @@ export default function Contact() {
 
   return (
     <>
-      {/* PageHeader animates from top (same as Login/Register) */}
+      {/* Page Header */}
       <motion.div
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

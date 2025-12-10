@@ -15,6 +15,8 @@ import Profile from "../pages/DashboardPages/User/Profile";
 import Settings from "../pages/DashboardPages/User/Settings";
 import DashboardHome from "../pages/DashboardPages/DashboardHome";
 import ApplyLoan from "../pages/ApplyLoan";
+import LoanApplications from "../pages/Admin/LoanApplications";
+import AddLoan from "../pages/Manager/AddLoan";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -66,6 +68,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "/dashboard/my-loans", element: <MyLoans /> },
+      { path: "add-loan", element: <AddLoan /> },
+      { path: "/dashboard/loan-applications", element: <LoanApplications /> },
       { path: "/dashboard/profile", element: <Profile /> },
       { path: "/dashboard/settings", element: <Settings /> },
     ],

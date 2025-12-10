@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Link, useLoaderData, useParams } from "react-router";
 import { FaCheckCircle } from "react-icons/fa";
 import PageHeader from "../Components/Shared/PageHeader";
+import { useEffect, useState } from "react";
+import Loader from "../Components/Shared/Loader";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -11,6 +13,15 @@ const fadeIn = {
 export default function LoanDetails() {
   const { loan, allLoans } = useLoaderData();
   const { id } = useParams();
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000); // simulate load
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) return <Loader />;
 
   return (
     <>
