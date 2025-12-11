@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
-import DashboardHeader from "../../Components/Dashboard/DashboardHeader";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
@@ -30,24 +29,21 @@ export default function LoanApplications() {
   if (isLoading) return <p className="text-center py-20">Loading...</p>;
 
   return (
-    <>
-      {/* Dashboard Header */}
+    <section className="py-10 px-6 bg-base-100">
       <motion.div
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <DashboardHeader title="Loan Applications" />
-      </motion.div>
-      <motion.div
-        className="p-8"
+        className="max-w-7xl mx-auto"
         initial="hidden"
         animate="visible"
         variants={fadeIn}
       >
-        <h1 className="text-3xl text-center text-gradient font-bold mb-6 font-rajdhani">
-          Loan Applications
-        </h1>
+        <div className="text-center mb-8">
+          <h2 className="font-rajdhani text-3xl font-bold mb-2">
+            Loan <span className="text-gradient">Applications</span>
+          </h2>
+          <p className="text-gray-600">
+            Check and Manage All Loan Applications
+          </p>
+        </div>
 
         {/* Filter */}
         <div className="mb-6 flex gap-4">
@@ -63,7 +59,7 @@ export default function LoanApplications() {
         </div>
 
         {/* Table */}
-        <div className=" bg-base-200 shadow rounded-xl">
+        <div className="overflow-x-auto bg-base-200 shadow rounded-xl">
           <table className="table">
             <thead className="bg-base-300">
               <tr>
@@ -78,7 +74,7 @@ export default function LoanApplications() {
 
             <tbody>
               {applications.map((app) => (
-                <tr key={app._id}>
+                <tr key={app._id} className="bg-transparent hover:bg-base-200">
                   <td>{app.loanId}</td>
 
                   <td>
@@ -208,6 +204,6 @@ export default function LoanApplications() {
           </dialog>
         )}
       </motion.div>
-    </>
+    </section>
   );
 }

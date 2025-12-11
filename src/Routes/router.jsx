@@ -19,16 +19,23 @@ import LoanApplications from "../pages/Admin/LoanApplications";
 import AddLoan from "../pages/Manager/AddLoan";
 import RoleRoute from "./RoleRoute";
 import AccessDenied from "../pages/AccessDenied";
+import ManageUsers from "../pages/Admin/ManageUsers";
 
 const API = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
   {
+    // ===========================
+    //        ROOT ROUTES
+    // ===========================
     path: "/",
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
+      // ===========================
+      //       LOAN API ROUTES
+      // ===========================
       {
         path: "all-loans",
         loader: () => fetch(`${API}/loans`),
@@ -61,14 +68,26 @@ const router = createBrowserRouter([
           return { loan };
         },
       },
-
+      // ===========================
+      //        AUTH ROUTES
+      // ===========================
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+
+      // ===========================
+      //        BASIC ROUTES
+      // ===========================
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },
     ],
   },
+  // ===========================
+  //        ACCESS DENIED
+  // ===========================
   { path: "/access-denied", element: <AccessDenied /> },
+  // ===========================
+  //       DASHBOARD ROUTES
+  // ===========================
   {
     path: "/dashboard",
     element: (
@@ -78,6 +97,9 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DashboardHome /> },
+      // ===========================
+      //       BORROWER ROUTES
+      // ===========================
       {
         path: "/dashboard/my-loans",
         element: (
@@ -86,11 +108,25 @@ const router = createBrowserRouter([
           </RoleRoute>
         ),
       },
+      // ===========================
+      //       MANAGER ROUTES
+      // ===========================
       {
         path: "add-loan",
         element: (
           <RoleRoute allowedRoles={["manager"]}>
             <AddLoan />
+          </RoleRoute>
+        ),
+      },
+      // ===========================
+      //       ADMIN ROUTES
+      // ===========================
+      {
+        path: "/dashboard/manage-users",
+        element: (
+          <RoleRoute allowedRoles={["admin"]}>
+            <ManageUsers />
           </RoleRoute>
         ),
       },
@@ -102,6 +138,9 @@ const router = createBrowserRouter([
           </RoleRoute>
         ),
       },
+      // ===========================
+      //   DASHBOARD BASIC ROUTES
+      // ===========================
       { path: "/dashboard/profile", element: <Profile /> },
       { path: "/dashboard/settings", element: <Settings /> },
     ],

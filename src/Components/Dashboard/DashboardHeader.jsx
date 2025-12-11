@@ -17,7 +17,7 @@ export default function PageHeader({ title, subtitle }) {
 
       {/* Content */}
       <div className="relative z-10 text-center text-white">
-        <h1 className="font-rajdhani text-4xl md:text-5xl font-bold">
+        <h1 className="font-rajdhani text-3xl md:text-4xl lg:text-5xl font-bold">
           {title}
         </h1>
 

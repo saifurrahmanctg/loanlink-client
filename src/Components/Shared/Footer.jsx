@@ -79,8 +79,10 @@ export default function Footer() {
       {/* COPYRIGHT BAR */}
       <div className="border-t border-base-300 py-4 text-center text-gray-600 dark:text-gray-400 text-sm">
         © {new Date().getFullYear()}
-        <span className="font-semibold mx-1">LoanLink</span>— All rights
-        reserved.
+        <span className="font-semibold mx-1 text-gradient text-md">
+          LoanLink
+        </span>
+        — All rights reserved.
       </div>
     </footer>
   );
