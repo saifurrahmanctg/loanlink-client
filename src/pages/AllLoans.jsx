@@ -21,25 +21,25 @@ export default function AllLoans() {
 
   /* ---------- derived categories ---------- */
   const categories = useMemo(
-    () => ["", ...new Set(loanData.map((l) => l["Loan Category"]))],
+    () => ["", ...new Set(loanData.map((l) => l.category))],
     [loanData]
   );
 
   /* ---------- filtering logic ---------- */
   const filtered = useMemo(() => {
     return loanData.filter((l) => {
-      const title = l["Loan Title"]?.toLowerCase() || "";
-      const category = l["Loan Category"]?.toLowerCase() || "";
+      const title = l.title?.toLowerCase() || "";
+      const category = l.category?.toLowerCase() || "";
 
       const matchesSearch =
         title.includes(search.toLowerCase()) ||
         category.includes(search.toLowerCase());
 
-      const matchesInterest = l.Interest <= interestMax;
-      const matchesAmount = l["Max Loan Limit"] <= amountMax;
+      const matchesInterest = l.interest <= interestMax;
+      const matchesAmount = l.maxLoanLimit <= amountMax;
 
       const matchesCategory =
-        !selectedCategory || l["Loan Category"] === selectedCategory;
+        !selectedCategory || l.category === selectedCategory;
 
       return (
         matchesSearch && matchesInterest && matchesAmount && matchesCategory
@@ -206,7 +206,7 @@ export default function AllLoans() {
           {/* Loan Cards */}
           <AnimatePresence mode="popLayout">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((loan, i) => (
+              {filtered.map((loan) => (
                 <motion.div
                   key={loan._id}
                   layout
@@ -218,25 +218,25 @@ export default function AllLoans() {
                 >
                   <figure className="h-48 w-full">
                     <img
-                      src={loan["Loan Image"]}
-                      alt={loan["Loan Title"]}
+                      src={loan.image}
+                      alt={loan.title}
                       className="w-full h-full object-cover"
                     />
                   </figure>
 
                   <div className="card-body p-4">
-                    <h3 className="card-title text-lg">{loan["Loan Title"]}</h3>
+                    <h3 className="card-title text-lg">{loan.title}</h3>
                     <p className="text-sm text-gray-500 mb-1">
-                      {loan["Loan Category"]}
+                      {loan.category}
                     </p>
 
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-primary font-semibold">
-                        {loan.Interest}% interest
+                        {loan.interest}% interest
                       </span>
 
                       <span className="text-gray-600">
-                        Up to ৳{loan["Max Loan Limit"]?.toLocaleString()}
+                        Up to ৳{loan.maxLoanLimit?.toLocaleString()}
                       </span>
                     </div>
 

@@ -12,33 +12,44 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
+import { FaList } from "react-icons/fa6";
 
 const DashSidebar = () => {
   const { user, logOut } = useAuth();
   const location = useLocation();
   const menuItems = [
+    // Dashboard Menu for ALL
     {
       label: "Home",
       path: "/dashboard",
       icon: <FaHome />,
       roles: ["admin", "manager", "borrower"],
     },
+    // Dashboard Menu for Borrower only
     {
       label: "My Loans",
       path: "/dashboard/my-loans",
       icon: <FaWallet />,
       roles: ["borrower"],
     },
+    // Dashboard Menu for Manager only
     {
       label: "Add Loan",
       path: "/dashboard/add-loan",
       icon: <FaPlusCircle />,
       roles: ["manager"],
     },
+    // Dashboard Menu for Admin only
     {
       label: "Manage Users",
       path: "/dashboard/manage-users",
       icon: <FaFileAlt />,
+      roles: ["admin"],
+    },
+    {
+      label: "All Loans",
+      path: "/dashboard/all-loans",
+      icon: <FaList />,
       roles: ["admin"],
     },
     {
@@ -48,7 +59,7 @@ const DashSidebar = () => {
       roles: ["admin"],
     },
   ];
-
+  // Dashboard Menu for ALL
   const userMenu = [
     {
       label: "Profile",

@@ -214,7 +214,7 @@ export default function ManageUsers() {
                       <div
                         className={`badge ${
                           u.role === "manager"
-                            ? "badge-success"
+                            ? "badge-accent"
                             : u.role === "borrower"
                             ? "badge-warning"
                             : "badge-error"
@@ -224,20 +224,27 @@ export default function ManageUsers() {
                       </div>
                     </td>
                     <td>
-                      <div className="flex gap-2 justify-center">
-                        <button
-                          className="btn btn-sm bg-gradient"
-                          onClick={() => handleOpenUserModal(u)}
-                        >
-                          Update Role
-                        </button>
-
-                        <button
-                          className="btn btn-sm bg-red-600 text-white"
-                          onClick={() => handleSuspendUser(u)}
-                        >
-                          Suspend
-                        </button>
+                      <div>
+                        {u.role === "admin" ? (
+                          <button className="btn btn-sm bg-accent">
+                            System Admin
+                          </button>
+                        ) : (
+                          <div className="flex gap-2 justify-center">
+                            <button
+                              className="btn btn-sm bg-gradient"
+                              onClick={() => handleOpenUserModal(u)}
+                            >
+                              Update Role
+                            </button>
+                            <button
+                              className="btn btn-sm bg-red-600 text-white"
+                              onClick={() => handleSuspendUser(u)}
+                            >
+                              Suspend
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>

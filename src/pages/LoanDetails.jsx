@@ -4,6 +4,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import PageHeader from "../Components/Shared/PageHeader";
 import { useEffect, useState } from "react";
 import Loader from "../Components/Shared/Loader";
+import { useAuth } from "../Provider/AuthProvider";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -11,6 +12,9 @@ const fadeIn = {
 };
 
 export default function LoanDetails() {
+  const { user } = useAuth();
+  console.log(user);
+
   const { loan, allLoans } = useLoaderData();
   const { id } = useParams();
 
@@ -62,7 +66,7 @@ export default function LoanDetails() {
                       }
                     `}
                   >
-                    {item["Loan Title"]}
+                    {item.title}
                   </Link>
                 </li>
               ))}
@@ -78,37 +82,37 @@ export default function LoanDetails() {
           >
             {/* Image */}
             <img
-              src={loan["Loan Image"]}
-              alt={loan["Loan Title"]}
+              src={loan.image}
+              alt={loan.title}
               className="w-full h-80 object-cover rounded-2xl shadow"
             />
 
             {/* Title + Category */}
             <div>
-              <h1 className="font-rajdhani text-4xl font-bold">
-                {loan["Loan Title"]}
-              </h1>
+              <h1 className="font-rajdhani text-4xl font-bold">{loan.title}</h1>
               <span className="badge badge-primary badge-outline mt-2">
-                {loan["Loan Category"]}
+                {loan.category}
               </span>
             </div>
 
             {/* Description */}
-            <p className="text-gray-600 leading-relaxed">{loan.description}</p>
+            <p className="text-gray-600 text-justify leading-relaxed">
+              {loan.description}
+            </p>
 
             {/* Loan Info */}
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-5 rounded-xl border border-blue-300 bg-base-300">
                 <h4 className="font-bold mb-2">Interest Rate</h4>
                 <p className="text-primary font-semibold text-lg">
-                  {loan.Interest}%
+                  {loan.interest}%
                 </p>
               </div>
 
               <div className="p-5 rounded-xl border border-blue-300  bg-base-300">
                 <h4 className="font-bold mb-2">Max Loan Limit</h4>
                 <p className="font-semibold text-lg">
-                  ৳{loan["Max Loan Limit"].toLocaleString()}
+                  ৳{loan.maxLoanLimit.toLocaleString()}
                 </p>
               </div>
 
@@ -122,13 +126,17 @@ export default function LoanDetails() {
 
             {/* Apply Button */}
             <motion.div whileTap={{ scale: 0.95 }}>
-              <Link
-                to={`/apply-loan/${loan._id}`}
-                className="btn bg-gradient w-full md:w-60"
-              >
-                <FaCheckCircle className="mr-2" />
-                Apply Now
-              </Link>
+              {user.role === "borrower" ? (
+                <Link
+                  to={`/apply-loan/${loan._id}`}
+                  className="btn bg-gradient w-full md:w-60"
+                >
+                  <FaCheckCircle className="mr-2" />
+                  Apply Now
+                </Link>
+              ) : (
+                ""
+              )}
             </motion.div>
           </motion.div>
         </div>

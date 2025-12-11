@@ -1,49 +1,36 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
-
+import { AnimatePresence, motion } from "framer-motion";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
-
-const hoverLift = {
-  whileHover: { y: -6, transition: { duration: 0.2 } },
-};
-
 const API = import.meta.env.VITE_API_URL;
 
 export default function AvailableLoans() {
-  const [loans, setLoans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Fetch all loans
+  const { data: loans = [], isLoading } = useQuery({
+    queryKey: ["home-loans"],
+    queryFn: async () => {
+      const res = await fetch(`${API}/loans`);
+      return res.json();
+    },
+  });
 
-  // Fetch loans from API
-  useEffect(() => {
-    fetch(`${API}/loans`)
-      .then((res) => res.json())
-      .then((data) => {
-        setLoans(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error loading loans:", err);
-        setLoading(false);
-      });
-  }, []);
+  // Only loans with showHome = true
+  const homeLoans = loans.filter((loan) => loan.showHome === true);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="text-center py-20">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
   }
 
-  const availableLoans = loans.slice(0, 6);
-
   return (
-    <section className="py-20 px-6 bg-base-300">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-16 bg-base-300">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Heading */}
         <motion.div
           initial="hidden"
@@ -60,72 +47,61 @@ export default function AvailableLoans() {
           </p>
         </motion.div>
 
+        {/* No loans found */}
+        {homeLoans.length === 0 && (
+          <p className="text-center text-lg text-gray-500">
+            No loans available at the moment.
+          </p>
+        )}
+
         {/* Loan Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {availableLoans.map((loan, i) => (
-            <motion.div
-              key={loan.id}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              custom={i}
-              {...hoverLift}
-              className="card bg-base-100 shadow hover:shadow-xl transition rounded-2xl overflow-hidden"
-            >
-              <figure className="h-48 w-full">
-                <img
-                  src={loan["Loan Image"]}
-                  alt={loan["Loan Title"]}
-                  className="w-full h-full object-cover"
-                />
-              </figure>
+        <AnimatePresence mode="popLayout">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {homeLoans.map((loan) => (
+              <motion.div
+                key={loan._id}
+                layout
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="card bg-base-100 shadow-lg hover:shadow-xl transition rounded-2xl overflow-hidden"
+              >
+                <figure className="h-48 w-full">
+                  <img
+                    src={loan.image}
+                    alt={loan.title}
+                    className="w-full h-full object-cover"
+                  />
+                </figure>
 
-              <div className="card-body p-5">
-                <h3 className="card-title text-lg">{loan["Loan Title"]}</h3>
+                <div className="card-body p-4">
+                  <h3 className="card-title text-lg">{loan.title}</h3>
+                  <p className="text-sm text-gray-500 mb-1">{loan.category}</p>
 
-                <p className="text-sm text-gray-500 mb-1">
-                  {loan["Loan Category"]}
-                </p>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-primary font-semibold">
+                      {loan.interest}% interest
+                    </span>
 
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-primary font-semibold">
-                    {loan.Interest}% interest
-                  </span>
+                    <span className="text-gray-600">
+                      Up to ৳{loan.maxLoanLimit?.toLocaleString()}
+                    </span>
+                  </div>
 
-                  <span className="text-gray-600">
-                    Up to ৳{loan["Max Loan Limit"]?.toLocaleString()}
-                  </span>
+                  <div className="card-actions mt-4">
+                    <Link
+                      to={`/loan-details/${loan._id}`}
+                      className="btn bg-gradient btn-sm btn-block"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </div>
-
-                <div className="card-actions mt-4">
-                  <Link
-                    to={`loan-details/${loan.id}`}
-                    className="btn bg-gradient btn-sm btn-block"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          className="text-center mt-12"
-        >
-          <Link
-            to="/all-loans"
-            className="btn bg-gradient btn-wide px-8 py-3 rounded shadow hover:shadow-xl transition"
-          >
-            See All Loans
-          </Link>
-        </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </AnimatePresence>
       </div>
     </section>
   );

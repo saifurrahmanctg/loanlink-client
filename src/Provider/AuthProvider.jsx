@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
         email,
         displayName: name,
         photoURL,
-        role: dbUser?.role || "borrower", // fallback role
+        role: dbUser?.role || "borrower",
         token,
       };
       setUser(profile);

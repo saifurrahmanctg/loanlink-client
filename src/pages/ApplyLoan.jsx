@@ -9,52 +9,28 @@ import { LiaMinusSolid } from "react-icons/lia";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 
-/* ---------------- Fade In Animation ---------------- */
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-/* ---------------- Window Size Hook ---------------- */
-function useWindowSize() {
-  const [size, setSize] = useState({
-    width: typeof window !== "undefined" ? window.innerWidth : 0,
-    height: typeof window !== "undefined" ? window.innerHeight : 0,
-  });
-
-  useEffect(() => {
-    const handle = () =>
-      setSize({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, []);
-
-  return size;
-}
-
 const API = import.meta.env.VITE_API_URL;
 
-/* =======================================================
-                APPLY LOAN PAGE
-======================================================= */
 export default function ApplyLoan() {
   const [showConfetti, setShowConfetti] = useState(false);
-  const { width, height } = useWindowSize();
-
-  const { loan } = useLoaderData();
+  const { loan } = useLoaderData(); // ⬅ loader returns { loan }
   const { id } = useParams();
   const { user } = useAuth();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
     reset,
+    formState: { errors },
   } = useForm();
 
-  /* ---------------- Side Spark Confetti ---------------- */
+  /* -------- Confetti -------- */
   const runSideConfetti = () => {
-    // LEFT burst
     confetti({
       particleCount: 80,
       angle: 60,
@@ -63,7 +39,6 @@ export default function ApplyLoan() {
       colors: ["#3b82f6", "#60a5fa", "#93c5fd"],
     });
 
-    // RIGHT burst
     confetti({
       particleCount: 80,
       angle: 120,
@@ -73,14 +48,25 @@ export default function ApplyLoan() {
     });
   };
 
-  /* ---------------- Auto-hide Confetti ---------------- */
   useEffect(() => {
-    if (!showConfetti) return;
-    const timer = setTimeout(() => setShowConfetti(false), 2200);
-    return () => clearTimeout(timer);
+    if (showConfetti) {
+      const t = setTimeout(() => setShowConfetti(false), 2000);
+      return () => clearTimeout(t);
+    }
   }, [showConfetti]);
 
-  /* ---------------- Submit Loan Application ---------------- */
+  /* -------- Auto-fill loan fields from MongoDB -------- */
+  useEffect(() => {
+    if (loan) {
+      reset({
+        loanTitle: loan.title,
+        interestRate: loan.interest,
+        userEmail: user.email,
+      });
+    }
+  }, [loan, user, reset]);
+
+  /* -------- Submit loan application -------- */
   const mutation = useMutation({
     mutationFn: async (payload) => {
       const res = await fetch(`${API}/loan-applications`, {
@@ -96,25 +82,30 @@ export default function ApplyLoan() {
 
       return res.json();
     },
+
     onSuccess: () => {
       setShowConfetti(true);
       runSideConfetti();
 
       Swal.fire({
+        icon: "success",
         title: "Application Submitted!",
         text: "Your loan application has been successfully submitted.",
-        icon: "success",
         confirmButtonColor: "#3b82f6",
       });
 
-      reset();
+      reset({
+        loanTitle: loan.title,
+        interestRate: loan.interest,
+        userEmail: user.email,
+      });
     },
-    onError: (error) => {
+
+    onError: (err) => {
       Swal.fire({
-        title: "Error",
-        text: error.message,
         icon: "error",
-        confirmButtonColor: "#ef4444",
+        title: "Error",
+        text: err.message,
       });
     },
   });
@@ -122,17 +113,17 @@ export default function ApplyLoan() {
   const onSubmit = (data) => {
     const payload = {
       ...data,
-      userEmail: user.email,
       loanId: id,
-      loanTitle: loan["Loan Title"],
-      interestRate: loan.Interest,
+      loanTitle: loan.title,
+      interestRate: loan.interest,
+      userEmail: user.email,
       submittedAt: new Date(),
     };
 
     mutation.mutate(payload);
   };
 
-  /* ---------------- Form Field Renderer ---------------- */
+  /* -------- Field Components -------- */
   const renderInput = (label, name, type = "text", readOnly = false) => (
     <div className="col-span-3">
       <label className="font-semibold">{label}</label>
@@ -151,8 +142,8 @@ export default function ApplyLoan() {
       <label className="font-semibold">{label}</label>
       <textarea
         {...register(name, { required })}
-        className="textarea border-0 w-full bg-base-300 mt-2"
         rows={rows}
+        className="textarea border-0 w-full bg-base-300 mt-2"
       />
       {errors[name] && <p className="text-red-500 text-sm">Required</p>}
     </div>
@@ -160,16 +151,15 @@ export default function ApplyLoan() {
 
   return (
     <>
-      {/* Confetti */}
       {showConfetti && <div />}
 
       {/* Page Header */}
       <motion.div
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
+        transition={{ duration: 0.45 }}
       >
-        <PageHeader title="Apply for Loan" subtitle={loan["Loan Title"]} />
+        <PageHeader title="Apply for Loan" subtitle={loan?.title} />
       </motion.div>
 
       <section className="py-10 px-6 bg-base-200">
@@ -184,12 +174,8 @@ export default function ApplyLoan() {
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* ---------------- Loan Details ---------------- */}
+            {/* -------- Loan Details -------- */}
             <div className="mb-10">
-              <p className="flex items-center gap-1 mb-1 text-gray-600">
-                Calculate Your Loan Amount{" "}
-                <LiaMinusSolid size={36} fill="#3B82F6" />
-              </p>
               <h2 className="text-4xl font-rajdhani font-bold mb-6 text-gradient border-l-4 border-blue-600 pl-2">
                 Loan Details
               </h2>
@@ -204,11 +190,8 @@ export default function ApplyLoan() {
               </div>
             </div>
 
-            {/* ---------------- Personal Details ---------------- */}
+            {/* -------- Personal Details -------- */}
             <div className="mb-10">
-              <p className="flex items-center gap-1 mb-1 text-gray-600">
-                Ask for More Details <LiaMinusSolid size={36} fill="#3B82F6" />
-              </p>
               <h2 className="text-4xl font-rajdhani font-bold mb-6 text-gradient border-l-4 border-blue-600 pl-2">
                 Personal Details
               </h2>
@@ -222,31 +205,25 @@ export default function ApplyLoan() {
               </div>
             </div>
 
-            {/* ---------------- Address ---------------- */}
+            {/* -------- Address -------- */}
             <div className="mb-10">
-              <p className="flex items-center gap-1 mb-1 text-gray-600">
-                Street, City And State{" "}
-                <LiaMinusSolid size={36} fill="#3B82F6" />
-              </p>
               <h2 className="text-4xl font-rajdhani font-bold mb-6 text-gradient border-l-4 border-blue-600 pl-2">
                 Address Details
               </h2>
+
               {renderTextarea("Address", "address")}
             </div>
 
-            {/* ---------------- Notes ---------------- */}
+            {/* -------- Extra Notes -------- */}
             <div className="mb-10">
-              <p className="flex items-center gap-1 mb-1 text-gray-600">
-                Write About Your Plans{" "}
-                <LiaMinusSolid size={36} fill="#3B82F6" />
-              </p>
               <h2 className="text-4xl font-rajdhani font-bold mb-6 text-gradient border-l-4 border-blue-600 pl-2">
                 Other Details
               </h2>
+
               {renderTextarea("Extra Notes (Optional)", "notes", 3, false)}
             </div>
 
-            {/* ---------------- Submit Button ---------------- */}
+            {/* -------- Submit Button -------- */}
             <div>
               <motion.button
                 whileTap={{ scale: 0.95 }}

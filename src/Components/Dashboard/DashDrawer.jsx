@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import DashSidebar from "./DashSidebar";
 import { Link, Outlet, useLocation } from "react-router";
-import { FaCog, FaFileAlt, FaHome, FaPlusCircle } from "react-icons/fa";
+import { FaCog, FaFileAlt, FaHome, FaList, FaPlusCircle } from "react-icons/fa";
 import { FaUser, FaWallet } from "react-icons/fa6";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
@@ -18,51 +18,14 @@ const DashDrawer = () => {
   const { user } = useAuth();
   const location = useLocation();
   const menuItems = [
-    {
-      label: "Dashboard Home",
-      path: "/dashboard",
-      icon: <FaHome />,
-      roles: ["admin", "manager", "borrower"],
-    },
-    {
-      label: "My Loans",
-      path: "/dashboard/my-loans",
-      icon: <FaWallet />,
-      roles: ["borrower"],
-    },
-    {
-      label: "Add Loan",
-      path: "/dashboard/add-loan",
-      icon: <FaPlusCircle />,
-      roles: ["manager"],
-    },
-    {
-      label: "Manage Users",
-      path: "/dashboard/manage-users",
-      icon: <FaFileAlt />,
-      roles: ["admin"],
-    },
-    {
-      label: "Loan Applications",
-      path: "/dashboard/loan-applications",
-      icon: <FaFileAlt />,
-      roles: ["admin"],
-    },
-  ];
-
-  const userMenu = [
-    {
-      label: "Profile",
-      path: "/dashboard/profile",
-      icon: <FaUser />,
-      roles: ["admin", "manager", "borrower"],
-    },
-    {
-      label: "Settings",
-      path: "/dashboard/settings",
-      icon: <FaCog />,
-      roles: ["admin", "manager", "borrower"],
-    },
+    { label: "Dashboard Home", path: "/dashboard" },
+    { label: "My Loans", path: "/dashboard/my-loans" },
+    { label: "Add Loan", path: "/dashboard/add-loan" },
+    { label: "Manage Users", path: "/dashboard/manage-users" },
+    { label: "All Loans", path: "/dashboard/all-loans" },
+    { label: "Loan Applications", path: "/dashboard/loan-applications" },
+    { label: "Profile", path: "/dashboard/profile" },
+    { label: "Settings", path: "/dashboard/settings" },
   ];
 
   const userPhoto = user?.photoURL || "?";
@@ -105,7 +68,6 @@ const DashDrawer = () => {
             <div className="mx-2 flex-1 px-2">
               <h1 className="font-rajdhani text-xl font-bold">
                 {menuItems.find((m) => m.path === location.pathname)?.label ||
-                  userMenu.find((m) => m.path === location.pathname)?.label ||
                   "Dashboard"}
               </h1>
             </div>
@@ -139,7 +101,6 @@ const DashDrawer = () => {
           <DashboardHeader
             title={
               menuItems.find((m) => m.path === location.pathname)?.label ||
-              userMenu.find((m) => m.path === location.pathname)?.label ||
               "Dashboard"
             }
           />

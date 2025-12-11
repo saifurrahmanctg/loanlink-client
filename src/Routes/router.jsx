@@ -20,6 +20,7 @@ import AddLoan from "../pages/Manager/AddLoan";
 import RoleRoute from "./RoleRoute";
 import AccessDenied from "../pages/AccessDenied";
 import ManageUsers from "../pages/Admin/ManageUsers";
+import AllAdminLoans from "../pages/Admin/AllAdminLoans";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -56,7 +57,7 @@ const router = createBrowserRouter([
       {
         path: "/apply-loan/:id",
         element: (
-          <RoleRoute allowedRoles={["admin", "manager", "borrower"]}>
+          <RoleRoute allowedRoles={["borrower"]}>
             <ApplyLoan />
           </RoleRoute>
         ),
@@ -127,6 +128,15 @@ const router = createBrowserRouter([
         element: (
           <RoleRoute allowedRoles={["admin"]}>
             <ManageUsers />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/dashboard/all-loans",
+        loader: () => fetch(`${API}/loans`),
+        element: (
+          <RoleRoute allowedRoles={["admin"]}>
+            <AllAdminLoans />
           </RoleRoute>
         ),
       },

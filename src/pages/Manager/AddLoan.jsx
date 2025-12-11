@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import Swal from "sweetalert2";
-import DashboardHeader from "../../Components/Dashboard/DashboardHeader";
+import { useAuth } from "../../Provider/AuthProvider";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
@@ -13,6 +13,7 @@ const API = import.meta.env.VITE_API_URL;
 const IMGBB_KEY = import.meta.env.VITE_IMGBB_KEY;
 
 export default function AddLoan() {
+  const { user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -20,11 +21,19 @@ export default function AddLoan() {
     reset,
   } = useForm();
 
+  // Main mutation
   const mutation = useMutation({
     mutationFn: async (formData) => {
-      // ------- UPLOAD IMAGE TO IMGBB -------
-      let LoanImageURL = "";
+      if (!user?.email) throw new Error("No logged-in user found");
 
+      // Convert EMI string to array
+      const emiArray = formData.emiPlans
+        .split(",")
+        .map((n) => Number(n.trim()))
+        .filter((n) => !isNaN(n));
+
+      // 1️⃣ Upload Image FIRST
+      let imageURL = "";
       if (formData.loanImage?.length > 0) {
         const file = formData.loanImage[0];
         const imgForm = new FormData();
@@ -32,32 +41,29 @@ export default function AddLoan() {
 
         const uploadRes = await fetch(
           `https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`,
-          {
-            method: "POST",
-            body: imgForm,
-          }
+          { method: "POST", body: imgForm }
         );
 
         const uploadData = await uploadRes.json();
-        LoanImageURL = uploadData?.data?.url || "";
+        imageURL = uploadData?.data?.url;
+
+        if (!imageURL) {
+          throw new Error("Image upload failed");
+        }
       }
 
-      // ------- CONVERT EMI STRING TO ARRAY -------
-      const emiArray = formData.emiPlans
-        .split(",")
-        .map((num) => Number(num.trim()))
-        .filter((n) => !isNaN(n));
-
-      // ------- FINAL PAYLOAD MATCHING YOUR DB FORMAT -------
+      // 2️⃣ Save loan with IMAGE URL included
       const payload = {
-        id: Date.now(), // auto generate ID
-        "Loan Image": LoanImageURL,
-        "Loan Title": formData.loanTitle,
-        "Loan Category": formData.loanCategory,
-        Interest: Number(formData.interest),
-        "Max Loan Limit": Number(formData.maxLoanLimit),
+        title: formData.loanTitle,
+        category: formData.loanCategory,
+        interest: Number(formData.interest),
+        maxLoanLimit: Number(formData.maxLoanLimit),
         description: formData.description,
         availableEMIPlans: emiArray,
+        image: imageURL, // NOW we save the correct URL
+        createdBy: user.email,
+        showOnHome: false,
+        createdAt: new Date(),
       };
 
       const res = await fetch(`${API}/loans`, {
@@ -66,142 +72,138 @@ export default function AddLoan() {
         body: JSON.stringify(payload),
       });
 
-      return res.json();
+      if (!res.ok) throw new Error("Failed to add loan");
+
+      return await res.json();
     },
 
     onSuccess: () => {
       Swal.fire({
         icon: "success",
-        title: "Loan Added Successfully",
-        text: "The loan has been stored in the database.",
+        title: "Loan Added Successfully!",
+        text: "Your loan has been added with image.",
+        timer: 2500,
+        showConfirmButton: false,
       });
       reset();
     },
 
-    onError: () => {
+    onError: (err) => {
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Failed to add loan. Please try again.",
+        title: "Error Occurred",
+        text: err.message || "Something went wrong",
       });
     },
   });
 
-  const onSubmit = (data) => mutation.mutate(data);
-
   return (
-    <>
+    <section className="py-10 px-6 bg-base-100">
       <motion.div
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
+        className="max-w-4xl mx-auto bg-base-300 shadow-lg rounded p-10"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
       >
-        <DashboardHeader title="Add Loan" />
-      </motion.div>
-
-      <section className="py-10 px-6 bg-base-100">
-        <motion.div
-          className="max-w-4xl mx-auto bg-base-300 shadow-lg rounded p-10"
-          initial="hidden"
-          animate="visible"
-          variants={fadeIn}
-        >
-          <h2 className="text-3xl font-bold mb-8 text-center font-rajdhani text-gradient">
-            Add New Loan
+        <div className="text-center mb-8">
+          <h2 className="font-rajdhani text-3xl font-bold mb-2">
+            Add <span className="text-gradient">Loan</span>
           </h2>
+          <p className="text-gray-600">
+            Enter the following details to add a new loan
+          </p>
+        </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="md:grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            {/* Loan Title */}
-            <div className="col-span-2 mb-4 md:mb-0">
-              <label className="font-semibold">Loan Title</label>
-              <input
-                {...register("loanTitle", { required: true })}
-                className="input input-bordered w-full mt-2 md:mt-0"
-              />
-              {errors.loanTitle && <p className="text-red-500">Required</p>}
-            </div>
+        <form
+          onSubmit={handleSubmit((data) => mutation.mutate(data))}
+          className="md:grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div className="col-span-2">
+            <label className="font-semibold">Loan Title</label>
+            <input
+              {...register("loanTitle", { required: true })}
+              className="input input-bordered w-full"
+            />
+            {errors.loanTitle && <p className="text-red-500">Required</p>}
+          </div>
 
-            {/* Loan Category */}
-            <div className="mb-4 md:mb-0">
-              <label className="font-semibold">Loan Category</label>
-              <input
-                {...register("loanCategory", { required: true })}
-                className="input input-bordered w-full mt-2 md:mt-0"
-              />
-              {errors.loanCategory && <p className="text-red-500">Required</p>}
-            </div>
+          <div>
+            <label className="font-semibold">Loan Category</label>
+            <input
+              {...register("loanCategory", { required: true })}
+              className="input input-bordered w-full"
+            />
+            {errors.loanCategory && <p className="text-red-500">Required</p>}
+          </div>
 
-            {/* Interest */}
-            <div className="mb-4 md:mb-0">
-              <label className="font-semibold">Interest (%)</label>
-              <input
-                type="number"
-                {...register("interest", { required: true })}
-                className="input input-bordered w-full mt-2 md:mt-0"
-              />
-              {errors.interest && <p className="text-red-500">Required</p>}
-            </div>
+          <div>
+            <label className="font-semibold">Interest (%)</label>
+            <input
+              type="number"
+              {...register("interest", { required: true })}
+              className="input input-bordered w-full"
+            />
+            {errors.interest && <p className="text-red-500">Required</p>}
+          </div>
 
-            {/* Max Loan Limit */}
-            <div className="mb-4 md:mb-0">
-              <label className="font-semibold">Max Loan Limit</label>
-              <input
-                type="number"
-                {...register("maxLoanLimit", { required: true })}
-                className="input input-bordered w-full mt-2 md:mt-0"
-              />
-              {errors.maxLoanLimit && <p className="text-red-500">Required</p>}
-            </div>
+          <div>
+            <label className="font-semibold">Max Loan Limit</label>
+            <input
+              type="number"
+              {...register("maxLoanLimit", { required: true })}
+              className="input input-bordered w-full"
+            />
+            {errors.maxLoanLimit && <p className="text-red-500">Required</p>}
+          </div>
 
-            {/* EMI Plans */}
-            <div className="mb-4 md:mb-0">
-              <label className="font-semibold">EMI Plans</label>
-              <input
-                {...register("emiPlans", { required: true })}
-                placeholder="e.g. 3, 6, 9, 12"
-                className="input input-bordered w-full mt-2 md:mt-0"
-              />
-              {errors.emiPlans && <p className="text-red-500">Required</p>}
-            </div>
+          <div>
+            <label className="font-semibold">EMI Plans</label>
+            <input
+              {...register("emiPlans", { required: true })}
+              placeholder="e.g. 3, 6, 9, 12"
+              className="input input-bordered w-full"
+            />
+            {errors.emiPlans && <p className="text-red-500">Required</p>}
+          </div>
 
-            {/* Description */}
-            <div className="col-span-2 mb-4 md:mb-0">
-              <label className="font-semibold">Description</label>
-              <textarea
-                {...register("description", { required: true })}
-                rows={3}
-                className="textarea textarea-bordered w-full mt-2 md:mt-0"
-              ></textarea>
-              {errors.description && <p className="text-red-500">Required</p>}
-            </div>
+          <div className="col-span-2">
+            <label className="font-semibold">Description</label>
+            <textarea
+              {...register("description", { required: true })}
+              rows={3}
+              className="textarea textarea-bordered w-full"
+            />
+            {errors.description && <p className="text-red-500">Required</p>}
+          </div>
 
-            {/* Loan Image */}
-            <div className="col-span-2 mb-4 md:mb-0">
-              <label className="font-semibold">Loan Image</label>
-              <input
-                type="file"
-                {...register("loanImage", { required: true })}
-                className="file-input file-input-bordered w-full mt-2 md:mt-0"
-              />
-              {errors.loanImage && <p className="text-red-500">Required</p>}
-            </div>
+          <div className="col-span-2">
+            <label className="font-semibold">Loan Image</label>
+            <input
+              type="file"
+              {...register("loanImage", { required: true })}
+              className="file-input file-input-bordered w-full"
+            />
+            {errors.loanImage && <p className="text-red-500">Image Required</p>}
+          </div>
 
-            {/* Submit */}
-            <div className="col-span-2 mt-6 flex">
-              <button
-                type="submit"
-                className="btn w-full md:btn-wide bg-gradient px-10 text-white"
-                disabled={mutation.isLoading}
-              >
-                {mutation.isLoading ? "Submitting..." : "Add Loan"}
-              </button>
-            </div>
-          </form>
-        </motion.div>
-      </section>
-    </>
+          <div className="col-span-2 mt-6">
+            <button
+              type="submit"
+              className="btn w-full bg-gradient text-white flex justify-center items-center"
+              disabled={mutation.isLoading}
+            >
+              {mutation.isLoading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm mr-2"></span>
+                  Uploading & Saving...
+                </>
+              ) : (
+                "Add Loan"
+              )}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </section>
   );
 }
