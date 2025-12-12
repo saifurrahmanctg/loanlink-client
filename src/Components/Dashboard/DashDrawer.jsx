@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import DashSidebar from "./DashSidebar";
 import { Link, Outlet, useLocation } from "react-router";
-import { FaCog, FaFileAlt, FaHome, FaList, FaPlusCircle } from "react-icons/fa";
-import { FaUser, FaWallet } from "react-icons/fa6";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
 import DashFooter from "./DashFooter";
@@ -17,6 +15,7 @@ const fadeIn = {
 const DashDrawer = () => {
   const { user } = useAuth();
   const location = useLocation();
+
   const menuItems = [
     { label: "Dashboard Home", path: "/dashboard" },
     { label: "My Loans", path: "/dashboard/my-loans" },
@@ -37,11 +36,23 @@ const DashDrawer = () => {
     return "?";
   };
 
+  // ----------------------------------
+  //        DYNAMIC DOCUMENT TITLE
+  // ----------------------------------
+  useEffect(() => {
+    const active = menuItems.find((m) => m.path === location.pathname);
+
+    if (active) {
+      document.title = `${active.label} | Dashboard | LoanLink`;
+    } else {
+      document.title = "Dashboard | LoanLink";
+    }
+  }, [location.pathname]);
+
   return (
     <div className="drawer md:drawer-open">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
-        {/* Page content here */}
         <div className="navbar bg-base-300 w-full sticky top-0 z-50">
           <div className="navbar-start">
             <div className="flex-none md:hidden">
@@ -93,6 +104,7 @@ const DashDrawer = () => {
             </Link>
           </div>
         </div>
+
         <motion.div
           initial={{ y: -60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -105,6 +117,7 @@ const DashDrawer = () => {
             }
           />
         </motion.div>
+
         <div className="min-h-[calc(100vh-192px)] md:min-h-[calc(100vh-224px)] flex flex-col">
           <div className="flex-1">
             <Outlet />
@@ -113,6 +126,7 @@ const DashDrawer = () => {
           <DashFooter />
         </div>
       </div>
+
       <div className="drawer-side">
         <label
           htmlFor="my-drawer"
@@ -120,7 +134,6 @@ const DashDrawer = () => {
           className="drawer-overlay"
         ></label>
 
-        {/* Sidebar content here */}
         <div className="min-h-screen">
           <DashSidebar />
         </div>

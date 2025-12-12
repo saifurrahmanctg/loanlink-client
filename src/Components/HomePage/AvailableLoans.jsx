@@ -102,6 +102,22 @@ export default function AvailableLoans() {
             ))}
           </div>
         </AnimatePresence>
+
+        {/* View All Loans Button */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          className="mt-12 flex justify-center"
+        >
+          <Link
+            to="/all-loans"
+            className="btn bg-gradient btn-wide px-8 py-3 rounded shadow hover:shadow-xl transition"
+          >
+            View All Loans
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

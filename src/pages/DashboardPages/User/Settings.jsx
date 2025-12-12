@@ -92,7 +92,7 @@ export default function Settings() {
   return (
     <section className="py-10 px-6 flex justify-center bg-base-100 min-h-screen">
       <motion.div
-        className="glass-card max-w-3xl w-full p-8 rounded-xl shadow-xl"
+        className="glass-card bg-base-300 max-w-3xl w-full p-8 rounded-xl shadow-xl"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -142,7 +142,7 @@ export default function Settings() {
           {/* Save Button */}
           <motion.button
             whileTap={{ scale: 0.95 }}
-            className="btn bg-gradient text-white w-full mt-4"
+            className="btn bg-gradient text-white w-full mt-4 hover:opacity-80"
             type="submit"
           >
             Save Changes
@@ -152,7 +152,7 @@ export default function Settings() {
         {/* Change Password Button */}
         <div className="text-center mt-6">
           <button
-            className="btn btn-outline btn-primary"
+            className="btn btn-outline btn-primary hover:bg-gradient"
             onClick={handlePasswordChange}
           >
             Change Password

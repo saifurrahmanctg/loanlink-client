@@ -5,6 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useClickAway } from "react-use";
 import { IoMoon } from "react-icons/io5";
 import { MdSunny } from "react-icons/md";
+import {
+  FiHome,
+  FiList,
+  FiInfo,
+  FiMail,
+  FiLogIn,
+  FiLogOut,
+  FiMenu,
+  FiX,
+} from "react-icons/fi";
+import { TbLayoutDashboard } from "react-icons/tb";
 import logo from "../../assets/main-logo.png";
 import { useAuth } from "../../Provider/AuthProvider";
 
@@ -13,7 +24,7 @@ export default function Navbar() {
   const [theme, setTheme] = useState("light");
   const { user, logOut } = useAuth();
 
-  /* ---------- Load Saved Theme ---------- */
+  /* ---------- theme ---------- */
   useEffect(() => {
     const saved = localStorage.getItem("theme") || "light";
     setTheme(saved);
@@ -27,7 +38,7 @@ export default function Navbar() {
     localStorage.setItem("theme", newTheme);
   };
 
-  /* ---------- Avatar Dropdown ---------- */
+  /* ---------- avatar dropdown ---------- */
   const AvatarDropdown = () => {
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
@@ -67,9 +78,10 @@ export default function Navbar() {
             >
               <NavLink
                 to="/dashboard"
-                className="block px-4 py-2 hover:bg-base-200"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-base-300"
                 onClick={() => setOpen(false)}
               >
+                <TbLayoutDashboard />
                 Dashboard
               </NavLink>
 
@@ -78,8 +90,9 @@ export default function Navbar() {
                   setOpen(false);
                   logOut();
                 }}
-                className="block w-full text-left px-4 py-2 hover:bg-base-200"
+                className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-base-300"
               >
+                <FiLogOut />
                 Logout
               </button>
             </motion.div>
@@ -89,15 +102,15 @@ export default function Navbar() {
     );
   };
 
-  /* ---------- Navigation Links ---------- */
+  /* ---------- nav links ---------- */
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "All Loans", path: "/all-loans" },
-    { name: "About Us", path: "/about" },
-    { name: "Contact Us", path: "/contact" },
+    { name: "Home", path: "/", icon: <FiHome /> },
+    { name: "All Loans", path: "/all-loans", icon: <FiList /> },
+    { name: "About Us", path: "/about", icon: <FiInfo /> },
+    { name: "Contact Us", path: "/contact", icon: <FiMail /> },
   ];
 
-  /* ---------- Theme Button Component ---------- */
+  /* ---------- theme button ---------- */
   const ThemeButton = (
     <motion.button
       onClick={toggleTheme}
@@ -121,76 +134,65 @@ export default function Navbar() {
   return (
     <nav className="navbar-container bg-base-300 shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
-        {/* ---------- DESKTOP NAV ---------- */}
+        {/* ---------- DESKTOP ---------- */}
         <div className="hidden md:flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/">
             <img src={logo} alt="Logo" className="h-10 w-auto" />
           </Link>
 
-          {/* Links */}
           <div className="flex space-x-6 text-[#4A6CF7]">
             {navLinks.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  ` transition-all duration-300 text-blue-700 ${
-                    isActive ? "font-bold border-b-3" : ""
+                  `flex items-center gap-2 transition-all duration-300 ${
+                    isActive ? "font-bold border-b-2 border-[#4A6CF7]" : ""
                   }`
                 }
               >
-                {item.name}
+                {item.icon}
+                <span>{item.name}</span>
               </NavLink>
             ))}
           </div>
 
-          {/* Right Section */}
           <div className="flex items-center gap-4">
             {ThemeButton}
             {user ? (
               <AvatarDropdown />
             ) : (
-              <NavLink to="/login" className="btn bg-gradient rounded">
+              <NavLink
+                to="/login"
+                className="btn bg-gradient rounded flex items-center gap-2"
+              >
+                <FiLogIn />
                 Login
               </NavLink>
             )}
           </div>
         </div>
 
-        {/* ---------- MOBILE NAV ---------- */}
+        {/* ---------- MOBILE ---------- */}
         <div className="md:hidden flex items-center justify-between h-16 w-full">
-          {/* Hamburger */}
           <button onClick={() => setMenuOpen(!menuOpen)}>
-            <svg className="h-7 w-7" fill="none" stroke="currentColor">
-              {menuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
+            {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
 
-          {/* Logo */}
           <Link to="/" className="flex-1 flex justify-center">
             <img src={logo} alt="Logo" className="h-10 w-auto" />
           </Link>
 
-          {/* Theme + Avatar */}
           <div className="flex items-center gap-3">
             {ThemeButton}
             {user ? (
               <AvatarDropdown />
             ) : (
-              <NavLink to="/login" className="btn bg-gradient rounded">
+              <NavLink
+                to="/login"
+                className="btn bg-gradient rounded flex items-center gap-2"
+              >
+                <FiLogIn />
                 Login
               </NavLink>
             )}
@@ -212,13 +214,15 @@ export default function Navbar() {
                 <NavLink
                   key={item.name}
                   to={item.path}
+                  onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
-                    ` transition-all duration-300 text-blue-700 ${
-                      isActive ? "font-bold border-b-3" : ""
+                    `flex items-center gap-3 transition-all duration-300 ${
+                      isActive ? "font-bold" : ""
                     }`
                   }
                 >
-                  {item.name}
+                  {item.icon}
+                  <span>{item.name}</span>
                 </NavLink>
               ))}
             </div>

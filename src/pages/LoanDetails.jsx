@@ -35,7 +35,7 @@ export default function LoanDetails() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <PageHeader title="Loan Details" subtitle={loan["Loan Title"]} />
+        <PageHeader title="Loan Details" subtitle={loan.title} />
       </motion.div>
 
       {/* Main Content */}

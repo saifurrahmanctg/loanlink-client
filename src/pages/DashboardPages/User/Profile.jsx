@@ -38,7 +38,7 @@ export default function Profile() {
   return (
     <section className="py-10 px-6 bg-base-100 min-h-screen flex justify-center">
       <motion.div
-        className="glass-card max-w-3xl w-full rounded-xl shadow-xl p-8"
+        className="glass-card max-w-3xl w-full bg-base-300 rounded-xl shadow-xl p-8"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}

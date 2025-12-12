@@ -14,9 +14,6 @@ export default function ManageUsers() {
   const [loading, setLoading] = useState(true);
   const API = import.meta.env.VITE_API_URL;
 
-  /* =============================
-        FETCH ALL USERS
-  ============================= */
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -36,9 +33,7 @@ export default function ManageUsers() {
     fetchUsers();
   }, []);
 
-  /* =============================
-        UPDATE USER ROLE 
-  ============================= */
+  // Update Role
   const handleUpdateRole = async (email, newRole) => {
     try {
       const res = await fetch(`${API}/users/role/${email}`, {
@@ -47,7 +42,6 @@ export default function ManageUsers() {
         body: JSON.stringify({ role: newRole }),
       });
       if (!res.ok) throw new Error("Failed to update role");
-
       Swal.fire("Success", "User role updated successfully.", "success");
       fetchUsers();
     } catch (err) {
@@ -56,71 +50,69 @@ export default function ManageUsers() {
     }
   };
 
-  /* =============================
-     SHOW USER DETAILS MODAL 
-  ============================= */
+  // Modern Update Role Modal
   const handleOpenUserModal = (userData) => {
     Swal.fire({
-      title: `<strong>Manage User</strong>`,
-      width: 500,
+      title: "Manage User",
       html: `
-        <div style="text-align:left; font-size:15px;">
-          <img src="${
-            userData.photo
-          }" class="rounded" style="width:80px; height:80px; margin-bottom:10px;" />
-          <p><strong>Name:</strong> ${userData.name}</p>
-          <p><strong>Email:</strong> ${userData.email}</p>
+        <div class="flex flex-col gap-4 text-left">
+          <div class="flex items-center gap-4">
+            <img src="${
+              userData.photo
+            }" class="w-16 h-16 rounded-full object-cover" />
+            <div>
+              <p class="font-semibold">${userData.name}</p>
+              <p class="text-sm text-gray-500">${userData.email}</p>
+            </div>
+          </div>
           <p><strong>Current Role:</strong> ${userData.role}</p>
-          <p><strong>Created At:</strong> ${userData.createdAt || "-"}</p>
         </div>
+        <select id="roleSelect" class="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="manager" ${
+            userData.role === "manager" ? "selected" : ""
+          }>Manager</option>
+          <option value="borrower" ${
+            userData.role === "borrower" ? "selected" : ""
+          }>Borrower</option>
+        </select>
       `,
       showCancelButton: true,
-      confirmButtonText: "Change Role",
+      confirmButtonText: "Update Role",
       cancelButtonText: "Close",
+      focusConfirm: false,
+      preConfirm: () => {
+        const newRole = document.getElementById("roleSelect").value;
+        return newRole;
+      },
     }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "Select New Role",
-          input: "select",
-          inputOptions: {
-            manager: "Manager",
-            borrower: "Borrower",
-            admin: "Admin",
-          },
-          inputValue: userData.role,
-          showCancelButton: true,
-        }).then((res) => {
-          if (res.isConfirmed && res.value !== userData.role) {
-            handleUpdateRole(userData.email, res.value);
-          }
-        });
+      if (result.isConfirmed && result.value !== userData.role) {
+        handleUpdateRole(userData.email, result.value);
       }
     });
   };
 
-  /*  =============================
-            SUSPEND USER 
-      ============================= */
+  // Modern Suspend User Modal
   const handleSuspendUser = async (userObj) => {
     Swal.fire({
       title: "Suspend User Account",
       html: `
-        <input id="reason" class="swal2-input" placeholder="Reason for suspension">
-        <textarea id="feedback" class="swal2-textarea" placeholder="Extra feedback"></textarea>
+        <div class="flex flex-col gap-3">
+          <label class="font-semibold">Reason for suspension</label>
+          <input id="reason" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Reason" />
+          <label class="font-semibold">Extra Feedback (optional)</label>
+          <textarea id="feedback" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Feedback"></textarea>
+        </div>
       `,
       showCancelButton: true,
       confirmButtonText: "Suspend",
       preConfirm: () => {
         const reason = document.getElementById("reason").value.trim();
         const feedback = document.getElementById("feedback").value.trim();
-        if (!reason || !feedback) {
-          Swal.showValidationMessage("Both fields are required.");
-        }
+        if (!reason) Swal.showValidationMessage("Reason is required.");
         return { reason, feedback };
       },
     }).then(async (form) => {
       if (!form.value) return;
-
       const confirmSuspend = await Swal.fire({
         title: "Are you sure?",
         text: `This will permanently remove ${userObj.email} from the database.`,
@@ -129,24 +121,19 @@ export default function ManageUsers() {
         confirmButtonColor: "#d33",
         confirmButtonText: "Yes, Suspend",
       });
-
       if (!confirmSuspend.isConfirmed) return;
-
       try {
         const res = await fetch(`${API}/users/${userObj._id}/suspend`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form.value),
         });
-
         if (!res.ok) throw new Error("Failed to suspend user");
-
         Swal.fire(
           "Suspended",
           "User account has been suspended and removed.",
           "success"
         );
-
         fetchUsers();
       } catch (err) {
         console.error(err);
@@ -155,9 +142,6 @@ export default function ManageUsers() {
     });
   };
 
-  /* =============================
-        ACCESS CONTROL
-  ============================= */
   if (!user || user.role !== "admin") {
     return (
       <p className="text-red-600 font-bold p-6">
@@ -166,9 +150,6 @@ export default function ManageUsers() {
     );
   }
 
-  /* =============================
-        RENDER UI
-  ============================= */
   return (
     <section className="py-10 px-6 bg-base-100">
       <motion.div
@@ -177,7 +158,7 @@ export default function ManageUsers() {
         animate="visible"
         variants={fadeIn}
       >
-        {/* Page Header */}
+        {/* Header */}
         <div className="text-center mb-8">
           <h2 className="font-rajdhani text-3xl font-bold mb-2">
             Manage <span className="text-gradient">Users</span>
@@ -191,7 +172,7 @@ export default function ManageUsers() {
           <p className="text-center">Loading users...</p>
         ) : (
           <div className="overflow-x-auto bg-base-200 shadow rounded-xl">
-            <table className="table">
+            <table className="table table-zebra">
               <thead>
                 <tr className="bg-base-300">
                   <th>Photo</th>
@@ -201,17 +182,29 @@ export default function ManageUsers() {
                   <th className="text-center">Actions</th>
                 </tr>
               </thead>
-
               <tbody>
+                {users.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="text-center py-4">
+                      No users found.
+                    </td>
+                  </tr>
+                )}
                 {users.map((u) => (
-                  <tr key={u._id} className="hover:bg-base-100">
+                  <tr
+                    key={u._id}
+                    className="hover:bg-base-100 transition-all duration-200"
+                  >
                     <td>
-                      <img src={u.photo} className="w-10 h-10 rounded-md" />
+                      <img
+                        src={u.photo}
+                        className="w-10 h-10 rounded-md object-cover"
+                      />
                     </td>
                     <td>{u.name}</td>
                     <td>{u.email}</td>
                     <td>
-                      <div
+                      <span
                         className={`badge ${
                           u.role === "manager"
                             ? "badge-accent"
@@ -221,42 +214,32 @@ export default function ManageUsers() {
                         }`}
                       >
                         {u.role}
-                      </div>
+                      </span>
                     </td>
-                    <td>
-                      <div>
-                        {u.role === "admin" ? (
-                          <button className="btn btn-sm bg-accent">
-                            System Admin
+                    <td className="text-center">
+                      {u.role === "admin" ? (
+                        <button className="btn btn-sm bg-accent cursor-not-allowed">
+                          System Admin
+                        </button>
+                      ) : (
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            className="btn btn-sm bg-gradient"
+                            onClick={() => handleOpenUserModal(u)}
+                          >
+                            Update Role
                           </button>
-                        ) : (
-                          <div className="flex gap-2 justify-center">
-                            <button
-                              className="btn btn-sm bg-gradient"
-                              onClick={() => handleOpenUserModal(u)}
-                            >
-                              Update Role
-                            </button>
-                            <button
-                              className="btn btn-sm bg-red-600 text-white"
-                              onClick={() => handleSuspendUser(u)}
-                            >
-                              Suspend
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                          <button
+                            className="btn btn-sm bg-red-600 text-white"
+                            onClick={() => handleSuspendUser(u)}
+                          >
+                            Suspend
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
-
-                {users.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="text-center py-4">
-                      No users found.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
