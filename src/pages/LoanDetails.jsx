@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useLoaderData, useParams } from "react-router";
+import { Link, useLoaderData, useParams, useNavigate } from "react-router";
 import { FaCheckCircle } from "react-icons/fa";
 import PageHeader from "../Components/Shared/PageHeader";
 import { useEffect, useState } from "react";
@@ -13,19 +13,26 @@ const fadeIn = {
 
 export default function LoanDetails() {
   const { user } = useAuth();
-  console.log(user);
-
   const { loan, allLoans } = useLoaderData();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000); // simulate load
+    const timer = setTimeout(() => setLoading(false), 500); // simulate load
     return () => clearTimeout(timer);
   }, []);
 
   if (loading) return <Loader />;
+
+  const handleApplyClick = () => {
+    if (!user) {
+      navigate("/login"); // guest → login
+    }
+    // Borrower → normal Link will handle navigation
+    // Admin/Manager → do nothing (disabled)
+  };
 
   return (
     <>
@@ -40,31 +47,27 @@ export default function LoanDetails() {
 
       {/* Main Content */}
       <section className="py-16 px-6 bg-base-100">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5  gap-10">
-          {/* ---------------------- Sidebar ---------------------- */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10">
+          {/* Sidebar */}
           <motion.aside
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-            className="md:col-span-2  bg-base-200 shadow rounded-xl p-5 h-fit"
+            className="md:col-span-2 bg-base-200 shadow rounded-xl p-5 h-fit"
           >
             <h3 className="font-rajdhani font-bold text-xl mb-4">
               All Loan Services
             </h3>
-
             <ul className="space-y-2">
               {allLoans.map((item) => (
                 <li key={item._id}>
                   <Link
                     to={`/loan-details/${item._id}`}
-                    className={`block px-4 py-2 rounded-lg border 
-                      transition-all 
-                      ${
-                        item._id === id
-                          ? "bg-gradient text-white border-primary"
-                          : "border-blue-500 hover:bg-base-100"
-                      }
-                    `}
+                    className={`block px-4 py-2 rounded-lg border transition-all ${
+                      item._id === id
+                        ? "bg-gradient text-white border-primary"
+                        : "border-blue-500 hover:bg-base-100"
+                    }`}
                   >
                     {item.title}
                   </Link>
@@ -73,21 +76,19 @@ export default function LoanDetails() {
             </ul>
           </motion.aside>
 
-          {/* ---------------------- Details Content ---------------------- */}
+          {/* Loan Details */}
           <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeIn}
             className="md:col-span-3 space-y-8"
           >
-            {/* Image */}
             <img
               src={loan.image}
               alt={loan.title}
               className="w-full h-80 object-cover rounded-2xl shadow"
             />
 
-            {/* Title + Category */}
             <div>
               <h1 className="font-rajdhani text-4xl font-bold">{loan.title}</h1>
               <span className="badge badge-primary badge-outline mt-2">
@@ -95,12 +96,10 @@ export default function LoanDetails() {
               </span>
             </div>
 
-            {/* Description */}
             <p className="text-gray-600 text-justify leading-relaxed">
               {loan.description}
             </p>
 
-            {/* Loan Info */}
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-5 rounded-xl border border-blue-300 bg-base-300">
                 <h4 className="font-bold mb-2">Interest Rate</h4>
@@ -108,15 +107,13 @@ export default function LoanDetails() {
                   {loan.interest}%
                 </p>
               </div>
-
-              <div className="p-5 rounded-xl border border-blue-300  bg-base-300">
+              <div className="p-5 rounded-xl border border-blue-300 bg-base-300">
                 <h4 className="font-bold mb-2">Max Loan Limit</h4>
                 <p className="font-semibold text-lg">
                   ৳{loan.maxLoanLimit.toLocaleString()}
                 </p>
               </div>
-
-              <div className="p-5 rounded-xl border border-blue-300  bg-base-300 md:col-span-2">
+              <div className="p-5 rounded-xl border border-blue-300 bg-base-300 md:col-span-2">
                 <h4 className="font-bold mb-2">Available EMI Plans</h4>
                 <p className="font-semibold">
                   {(loan.availableEMIPlans || []).join(", ")} months
@@ -126,7 +123,16 @@ export default function LoanDetails() {
 
             {/* Apply Button */}
             <motion.div whileTap={{ scale: 0.95 }}>
-              {user.role === "borrower" ? (
+              {!user && (
+                <button
+                  onClick={handleApplyClick}
+                  className="btn bg-gradient w-full md:w-60"
+                >
+                  <FaCheckCircle className="mr-2" />
+                  Apply Now
+                </button>
+              )}
+              {user?.role === "borrower" && (
                 <Link
                   to={`/apply-loan/${loan._id}`}
                   className="btn bg-gradient w-full md:w-60"
@@ -134,8 +140,16 @@ export default function LoanDetails() {
                   <FaCheckCircle className="mr-2" />
                   Apply Now
                 </Link>
-              ) : (
-                ""
+              )}
+              {(user?.role === "admin" || user?.role === "manager") && (
+                <button
+                  disabled
+                  className="btn w-full md:w-60 bg-gray-400 cursor-not-allowed tooltip tooltip-bottom"
+                  data-tip="Only borrowers can apply"
+                >
+                  <FaCheckCircle className="mr-2" />
+                  Apply Now
+                </button>
               )}
             </motion.div>
           </motion.div>

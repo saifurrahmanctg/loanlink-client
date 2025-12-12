@@ -82,9 +82,9 @@ export default function LoanApplications() {
               <thead className="bg-base-300">
                 <tr>
                   <th>Loan ID</th>
-                  <th>User Name</th>
-                  <th>Category</th>
-                  <th>Amount</th>
+                  <th>User Details</th>
+                  <th>Loan Category</th>
+                  <th>Loan Amount</th>
                   <th>Status</th>
                   <th>Action</th>
                 </tr>

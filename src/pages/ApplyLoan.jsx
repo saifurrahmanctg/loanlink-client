@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../Provider/AuthProvider";
 import Swal from "sweetalert2";
-import { LiaMinusSolid } from "react-icons/lia";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 
@@ -18,6 +17,8 @@ const API = import.meta.env.VITE_API_URL;
 
 export default function ApplyLoan() {
   const [showConfetti, setShowConfetti] = useState(false);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+
   const { loan } = useLoaderData(); // ⬅ loader returns { loan }
   const { id } = useParams();
   const { user } = useAuth();
@@ -48,16 +49,34 @@ export default function ApplyLoan() {
     });
   };
 
+  /* -------- Check if user already applied for this loan -------- */
   useEffect(() => {
-    if (showConfetti) {
-      const t = setTimeout(() => setShowConfetti(false), 2000);
-      return () => clearTimeout(t);
-    }
-  }, [showConfetti]);
+    const checkApplication = async () => {
+      if (!user) return;
+      try {
+        const res = await fetch(`${API}/loan-applications/user/${user.email}`);
+        if (!res.ok) throw new Error("Failed to fetch applications");
+        const apps = await res.json();
+        const hasApplied = apps.some((app) => app.loanId === id);
+        if (hasApplied) {
+          setAlreadyApplied(true);
+          Swal.fire({
+            icon: "info",
+            title: "Already Applied",
+            text: "You have already applied for this loan.",
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    checkApplication();
+  }, [user, id]);
 
   /* -------- Auto-fill loan fields from MongoDB -------- */
   useEffect(() => {
-    if (loan) {
+    if (loan && user) {
       reset({
         loanTitle: loan.title,
         interestRate: loan.interest,
@@ -86,6 +105,7 @@ export default function ApplyLoan() {
     onSuccess: () => {
       setShowConfetti(true);
       runSideConfetti();
+      setAlreadyApplied(true); // disable further submissions
 
       Swal.fire({
         icon: "success",
@@ -111,6 +131,15 @@ export default function ApplyLoan() {
   });
 
   const onSubmit = (data) => {
+    if (alreadyApplied) {
+      Swal.fire({
+        icon: "info",
+        title: "Already Applied",
+        text: "You have already applied for this loan.",
+      });
+      return;
+    }
+
     const payload = {
       ...data,
       loanId: id,
@@ -227,11 +256,17 @@ export default function ApplyLoan() {
             <div>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                disabled={mutation.isPending}
-                className="btn bg-gradient px-10 text-white"
+                disabled={mutation.isPending || alreadyApplied}
+                className={`btn bg-gradient px-10 text-white ${
+                  alreadyApplied ? "cursor-not-allowed opacity-50" : ""
+                }`}
                 type="submit"
               >
-                {mutation.isPending ? "Submitting..." : "Submit Application"}
+                {alreadyApplied
+                  ? "Already Applied"
+                  : mutation.isPending
+                  ? "Submitting..."
+                  : "Submit Application"}
               </motion.button>
             </div>
           </form>
