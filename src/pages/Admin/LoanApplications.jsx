@@ -83,7 +83,7 @@ export default function LoanApplications() {
                 <tr>
                   <th>Loan ID</th>
                   <th>User Details</th>
-                  <th>Loan Category</th>
+                  <th>Loan Title</th>
                   <th>Loan Amount</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -108,7 +108,10 @@ export default function LoanApplications() {
                     >
                       <td>{app.loanId}</td>
                       <td>
-                        {app.firstName} {app.lastName}
+                        <div>
+                          {app.firstName} {app.lastName}
+                        </div>
+                        <div>{app.userEmail}</div>
                       </td>
                       <td>{app.loanTitle}</td>
                       <td>৳{Number(app.loanAmount).toLocaleString()}</td>

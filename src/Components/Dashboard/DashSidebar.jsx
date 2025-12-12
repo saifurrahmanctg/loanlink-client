@@ -10,9 +10,10 @@ import {
   FaFileAlt,
   FaPlusCircle,
 } from "react-icons/fa";
+import { FaList } from "react-icons/fa6";
+import { FiSettings } from "react-icons/fi";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
-import { FaList } from "react-icons/fa6";
 
 const DashSidebar = () => {
   const { user, logOut } = useAuth();
@@ -37,6 +38,12 @@ const DashSidebar = () => {
       label: "Add Loan",
       path: "/dashboard/add-loan",
       icon: <FaPlusCircle />,
+      roles: ["manager"],
+    },
+    {
+      label: "Manage Loans",
+      path: "/dashboard/manage-loans",
+      icon: <FiSettings />,
       roles: ["manager"],
     },
     // Dashboard Menu for Admin only

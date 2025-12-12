@@ -20,6 +20,7 @@ const DashDrawer = () => {
     { label: "Dashboard Home", path: "/dashboard" },
     { label: "My Loans", path: "/dashboard/my-loans" },
     { label: "Add Loan", path: "/dashboard/add-loan" },
+    { label: "Manage Loans", path: "/dashboard/manage-loans" },
     { label: "Manage Users", path: "/dashboard/manage-users" },
     { label: "All Loans", path: "/dashboard/all-loans" },
     { label: "Loan Applications", path: "/dashboard/loan-applications" },
