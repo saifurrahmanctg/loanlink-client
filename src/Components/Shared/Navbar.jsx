@@ -1,5 +1,5 @@
 /* Navbar.jsx */
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useClickAway } from "react-use";
@@ -23,6 +23,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState("light");
   const { user, logOut } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   /* ---------- theme ---------- */
   useEffect(() => {
@@ -78,7 +80,7 @@ export default function Navbar() {
             >
               <NavLink
                 to="/dashboard"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-base-300"
+                className="btn w-full bg-gray-500 hover:bg-gray-700 text-white flex items-center gap-2"
                 onClick={() => setOpen(false)}
               >
                 <TbLayoutDashboard />
@@ -88,9 +90,9 @@ export default function Navbar() {
               <button
                 onClick={() => {
                   setOpen(false);
-                  logOut();
+                  handleLogout();
                 }}
-                className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-base-300"
+                className="btn w-full bg-red-500 hover:bg-red-700 text-white flex items-center gap-2"
               >
                 <FiLogOut />
                 Logout
@@ -131,11 +133,16 @@ export default function Navbar() {
     </motion.button>
   );
 
+  const handleLogout = async () => {
+    navigate("/", { replace: true });
+    await logOut();
+  };
+
   return (
     <nav className="navbar-container bg-base-300 shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         {/* ---------- DESKTOP ---------- */}
-        <div className="hidden md:flex items-center justify-between h-16">
+        <div className="hidden lg:flex items-center justify-between h-16">
           <Link to="/">
             <img src={logo} alt="Logo" className="h-10 w-auto" />
           </Link>
@@ -164,6 +171,7 @@ export default function Navbar() {
             ) : (
               <NavLink
                 to="/login"
+                state={{ from: location }}
                 className="btn bg-gradient rounded flex items-center gap-2"
               >
                 <FiLogIn />
@@ -174,7 +182,7 @@ export default function Navbar() {
         </div>
 
         {/* ---------- MOBILE ---------- */}
-        <div className="md:hidden flex items-center justify-between h-16 w-full">
+        <div className="lg:hidden flex items-center justify-between h-16 w-full">
           <button onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
@@ -190,6 +198,7 @@ export default function Navbar() {
             ) : (
               <NavLink
                 to="/login"
+                state={{ from: location }}
                 className="btn bg-gradient rounded flex items-center gap-2"
               >
                 <FiLogIn />
@@ -207,16 +216,16 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-base-100 px-4 pb-4"
+            className="lg:hidden bg-base-100 justify-center items-center px-4 py-3"
           >
-            <div className="flex flex-col space-y-3 text-[#4A6CF7]">
+            <div className="md:flex justify-center gap-5 items-center text-[#4A6CF7] space-y-3 md:space-y-0">
               {navLinks.map((item) => (
                 <NavLink
                   key={item.name}
                   to={item.path}
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 transition-all duration-300 ${
+                    `flex items-center gap-1  transition-all duration-300 ${
                       isActive ? "font-bold" : ""
                     }`
                   }

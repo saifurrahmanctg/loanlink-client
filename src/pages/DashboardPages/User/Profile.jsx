@@ -79,7 +79,7 @@ export default function Profile() {
           <ProfileItem label="Email" value={dbUser.email} />
           <ProfileItem
             label="Account Created"
-            value={dbUser.createdAt || "N/A"}
+            value={new Date(dbUser.createdAt).toLocaleString() || "N/A"}
           />
           <ProfileItem
             label="Last Login"

@@ -1,10 +1,17 @@
 import { motion } from "framer-motion";
-import { Link, useLoaderData, useParams, useNavigate } from "react-router";
+import {
+  Link,
+  useLoaderData,
+  useParams,
+  useNavigate,
+  useLocation,
+} from "react-router";
 import { FaCheckCircle } from "react-icons/fa";
 import PageHeader from "../Components/Shared/PageHeader";
 import { useEffect, useState } from "react";
 import Loader from "../Components/Shared/Loader";
 import { useAuth } from "../Provider/AuthProvider";
+import NotFound from "../Components/Shared/NotFound";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -16,6 +23,7 @@ export default function LoanDetails() {
   const { loan, allLoans } = useLoaderData();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [loading, setLoading] = useState(true);
 
@@ -25,13 +33,15 @@ export default function LoanDetails() {
   }, []);
 
   if (loading) return <Loader />;
+  if (!loan) return <NotFound />;
 
   const handleApplyClick = () => {
     if (!user) {
-      navigate("/login"); // guest → login
+      navigate("/login", {
+        replace: true,
+        state: { from: location },
+      });
     }
-    // Borrower → normal Link will handle navigation
-    // Admin/Manager → do nothing (disabled)
   };
 
   return (

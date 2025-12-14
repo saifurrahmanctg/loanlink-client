@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import {
   FaHome,
@@ -11,13 +11,14 @@ import {
   FaPlusCircle,
 } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
-import { FiSettings } from "react-icons/fi";
+import { FiSettings, FiClock } from "react-icons/fi";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
 
 const DashSidebar = () => {
   const { user, logOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const menuItems = [
     // Dashboard Menu for ALL
     {
@@ -44,6 +45,12 @@ const DashSidebar = () => {
       label: "Manage Loans",
       path: "/dashboard/manage-loans",
       icon: <FiSettings />,
+      roles: ["manager"],
+    },
+    {
+      label: "Pending Loans",
+      path: "/dashboard/pending-loans",
+      icon: <FiClock />,
       roles: ["manager"],
     },
     // Dashboard Menu for Admin only
@@ -81,6 +88,11 @@ const DashSidebar = () => {
       roles: ["admin", "manager", "borrower"],
     },
   ];
+  const handleLogout = async () => {
+    navigate("/", { replace: true });
+    await logOut();
+  };
+
   return (
     <div className="w-64 bg-base-300 text-base-content p-4 min-h-screen flex flex-col">
       <Link to="/" className="flex items-center gap-2 mb-6">
@@ -128,8 +140,8 @@ const DashSidebar = () => {
             ))}
         </ul>
         <button
-          onClick={logOut}
-          className="btn bg-red-600 w-full mt-4 flex items-center justify-center gap-2"
+          onClick={handleLogout}
+          className="btn bg-red-500 hover:bg-red-700 w-full text-white mt-4 flex items-center justify-center gap-2"
         >
           <FaSignOutAlt /> Logout
         </button>

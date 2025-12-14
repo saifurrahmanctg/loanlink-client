@@ -1,34 +1,10 @@
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-
-const slides = [
-  {
-    img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1920&q=80",
-    title: "Fast Micro-Loans, Fair Terms",
-    desc: "Get approved in minutes and access funds instantly with LoanLink’s transparent, data-driven lending.",
-    cta: "Apply for Loan",
-    link: "/login",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1920&q=80",
-    title: "Build Credit, Borrow Smarter",
-    desc: "Every repayment boosts your credit score—unlock higher limits and lower rates over time.",
-    cta: "Explore Loans",
-    link: "/all-loans",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1587560699334-cc4ff634909a?auto=format&fit=crop&w=1920&q=80",
-    title: "Zero Paperwork, 100% Digital",
-    desc: "Upload documents once, reuse forever. LoanLink keeps everything secure and seamless.",
-    cta: "Get Started",
-    link: "/register",
-  },
-];
 
 const fadeIn = {
   hidden: { opacity: 0, y: 40 },
@@ -36,6 +12,31 @@ const fadeIn = {
 };
 
 export default function HeroBanner() {
+  const location = useLocation();
+  const slides = [
+    {
+      img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1920&q=80",
+      title: "Fast Micro-Loans, Fair Terms",
+      desc: "Get approved in minutes and access funds instantly with LoanLink’s transparent, data-driven lending.",
+      cta: "Apply for Loan",
+      link: "/login",
+      state: { from: location },
+    },
+    {
+      img: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1920&q=80",
+      title: "Build Credit, Borrow Smarter",
+      desc: "Every repayment boosts your credit score—unlock higher limits and lower rates over time.",
+      cta: "Explore Loans",
+      link: "/all-loans",
+    },
+    {
+      img: "https://images.unsplash.com/photo-1587560699334-cc4ff634909a?auto=format&fit=crop&w=1920&q=80",
+      title: "Zero Paperwork, 100% Digital",
+      desc: "Upload documents once, reuse forever. LoanLink keeps everything secure and seamless.",
+      cta: "Get Started",
+      link: "/register",
+    },
+  ];
   return (
     <section className="relative w-full h-[350px] md:h-[500px] overflow-hidden">
       <Swiper
@@ -72,6 +73,7 @@ export default function HeroBanner() {
                 <p className="max-w-2xl text-base md:text-lg mb-8">{s.desc}</p>
                 <Link
                   to={s.link}
+                  state={s.state}
                   className="btn bg-gradient btn-lg px-8 py-3 rounded shadow hover:shadow-xl transition"
                 >
                   {s.cta}

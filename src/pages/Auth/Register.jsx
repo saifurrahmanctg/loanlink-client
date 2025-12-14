@@ -1,5 +1,5 @@
 /* Register.jsx */
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
@@ -52,6 +52,7 @@ const floatVariants = {
 
 /* ------------- page component ------------- */
 export default function Register() {
+  const location = useLocation();
   const [role, setRole] = useState("borrower");
   const roleOptions = [
     { value: "borrower", label: "Borrower" },
@@ -240,6 +241,7 @@ export default function Register() {
                 <div>
                   <Link
                     to="/login"
+                    state={{ from: location }}
                     className="bg-base-100 text-blue-500 px-4 py-2.5 rounded-l cursor-pointer"
                   >
                     Login
@@ -447,6 +449,7 @@ export default function Register() {
                 Already have an account?{" "}
                 <Link
                   to="/login"
+                  state={{ from: location }}
                   className="text-[#3BADE3] font-semibold hover:underline"
                 >
                   Login Now

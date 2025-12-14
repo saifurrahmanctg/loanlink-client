@@ -23,6 +23,7 @@ import AccessDenied from "../pages/AccessDenied";
 import ManageUsers from "../pages/Admin/ManageUsers";
 import AllAdminLoans from "../pages/Admin/AllAdminLoans";
 import ManageLoans from "../pages/Manager/ManageLoans";
+import PendingLoans from "../pages/Manager/PendingLoans";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -152,6 +153,15 @@ const router = createBrowserRouter([
         element: (
           <RoleRoute allowedRoles={["manager"]}>
             <ManageLoans />
+          </RoleRoute>
+        ),
+        handle: { title: "Add Loan" },
+      },
+      {
+        path: "pending-loans",
+        element: (
+          <RoleRoute allowedRoles={["manager"]}>
+            <PendingLoans />
           </RoleRoute>
         ),
         handle: { title: "Add Loan" },

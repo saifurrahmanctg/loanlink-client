@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
@@ -57,8 +57,17 @@ export default function Login() {
   } = useForm();
   const { login, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useDaisyTheme();
   const bgImage = theme === "dark" ? authBgDark : authBg;
+
+  const from = location.state?.from?.pathname || "/dashboard";
+
+  // Add this to debug
+  useEffect(() => {
+    console.log("Location state:", location);
+    console.log("From path:", from);
+  }, [location]);
 
   /* ---------- Email/Password login ---------- */
   const onSubmit = async ({ email, password }) => {
@@ -84,7 +93,7 @@ export default function Login() {
         timer: 2000,
         showConfirmButton: false,
       });
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     } catch (err) {
       MySwal.fire({ icon: "error", title: "Login failed", text: err.message });
     }
@@ -113,7 +122,7 @@ export default function Login() {
         timer: 2000,
         showConfirmButton: false,
       });
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     } catch (err) {
       MySwal.fire({
         icon: "error",
@@ -135,7 +144,7 @@ export default function Login() {
       </motion.div>
 
       <div className="bg-base-100">
-        <section className="lg:flex justify-center max-w-7xl mx-auto px-4 py-20">
+        <section className="md:flex justify-center max-w-7xl mx-auto px-4 py-20">
           {/* Left Image */}
           <motion.div
             initial={{ opacity: 0, x: -60 }}
@@ -188,12 +197,14 @@ export default function Login() {
                 <div>
                   <Link
                     to="/login"
+                    state={{ from: location }}
                     className="bg-gradient px-4 py-2.5 rounded-l cursor-pointer"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
+                    state={{ from: location }}
                     className="bg-base-100 text-blue-500 px-4 py-2.5 rounded-r cursor-pointer"
                   >
                     Register
@@ -287,12 +298,12 @@ export default function Login() {
               <motion.div
                 custom={7}
                 variants={fadeInVariants}
-                className="flex items-center gap-4 mt-4"
+                className="lg:flex items-center gap-4 mt-4"
               >
                 <button
                   type="button"
                   onClick={googleLogin}
-                  className="flex-1 btn btn-outline btn-accent rounded normal-case"
+                  className="flex-1 btn btn-outline btn-accent rounded normal-case w-full"
                 >
                   <FcGoogle className="mr-2 text-xl" />
                   Login with Google
@@ -301,7 +312,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => alert("GitHub login (demo)")}
-                  className="flex-1 btn btn-outline rounded normal-case"
+                  className="flex-1 btn btn-outline rounded normal-case w-full mt-4 lg:mt-0"
                 >
                   <FaGithub className="mr-2 text-xl" />
                   Login with GitHub
