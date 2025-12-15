@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../Provider/AuthProvider";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router";
+import { FaSignOutAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
   const [dbUser, setDbUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_URL;
 
@@ -34,6 +40,34 @@ export default function Profile() {
         User not found in database!
       </p>
     );
+
+  const handleLogout = async () => {
+    const result = await MySwal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out from your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log me out!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        navigate("/", { replace: true });
+        await logOut();
+        MySwal.fire({
+          icon: "success",
+          title: "Logged out successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (err) {
+        MySwal.fire("Error", err.message, "error");
+      }
+    }
+  };
 
   return (
     <section className="py-10 px-6 bg-base-100 min-h-screen flex justify-center">
@@ -95,8 +129,8 @@ export default function Profile() {
           />
         </div>
 
-        {/* Edit Button */}
-        <div className="text-center mt-8">
+        {/* Buttons */}
+        <div className="flex justify-between text-center mt-8">
           <motion.button
             whileTap={{ scale: 0.95 }}
             className="btn bg-gradient text-white px-8"
@@ -105,6 +139,12 @@ export default function Profile() {
             }
           >
             Edit Profile
+          </motion.button>
+          <motion.button
+            onClick={handleLogout}
+            className="btn bg-red-500 hover:bg-red-700  text-white flex items-center justify-center gap-2"
+          >
+            <FaSignOutAlt /> Logout
           </motion.button>
         </div>
       </motion.div>

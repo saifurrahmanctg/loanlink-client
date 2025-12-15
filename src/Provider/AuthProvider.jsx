@@ -173,7 +173,6 @@ export const AuthProvider = ({ children }) => {
     await signOut(auth);
     setUser(null);
     persistUser(null);
-    toast("info", "Logged out");
     setLoading(false);
   };
 

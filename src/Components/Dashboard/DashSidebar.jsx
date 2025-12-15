@@ -14,27 +14,29 @@ import { FaList } from "react-icons/fa6";
 import { FiSettings, FiClock, FiCheckCircle } from "react-icons/fi";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
-const DashSidebar = () => {
+const MySwal = withReactContent(Swal);
+
+const DashSidebar = ({ onLinkClick }) => {
   const { user, logOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
   const menuItems = [
-    // Dashboard Menu for ALL
     {
       label: "Home",
       path: "/dashboard",
       icon: <FaHome />,
       roles: ["admin", "manager", "borrower"],
     },
-    // Dashboard Menu for Borrower only
     {
       label: "My Loans",
       path: "/dashboard/my-loans",
       icon: <FaWallet />,
       roles: ["borrower"],
     },
-    // Dashboard Menu for Manager only
     {
       label: "Add Loan",
       path: "/dashboard/add-loan",
@@ -53,14 +55,12 @@ const DashSidebar = () => {
       icon: <FiClock />,
       roles: ["manager"],
     },
-
     {
       label: "Approved Loans",
       path: "/dashboard/approved-loans",
       icon: <FiCheckCircle />,
       roles: ["manager"],
     },
-    // Dashboard Menu for Admin only
     {
       label: "Manage Users",
       path: "/dashboard/manage-users",
@@ -80,7 +80,7 @@ const DashSidebar = () => {
       roles: ["admin"],
     },
   ];
-  // Dashboard Menu for ALL
+
   const userMenu = [
     {
       label: "Profile",
@@ -95,14 +95,47 @@ const DashSidebar = () => {
       roles: ["admin", "manager", "borrower"],
     },
   ];
+
   const handleLogout = async () => {
-    navigate("/", { replace: true });
-    await logOut();
+    const result = await MySwal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out from your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log me out!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        navigate("/", { replace: true });
+        await logOut();
+        MySwal.fire({
+          icon: "success",
+          title: "Logged out successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (err) {
+        MySwal.fire("Error", err.message, "error");
+      }
+    }
+  };
+
+  /* ---- wrapper ---- */
+  const handleLinkClick = () => {
+    if (onLinkClick) onLinkClick();
   };
 
   return (
     <div className="w-64 bg-base-300 text-base-content p-4 min-h-screen flex flex-col">
-      <Link to="/" className="flex items-center gap-2 mb-6">
+      <Link
+        to="/"
+        className="flex items-center gap-2 mb-6"
+        onClick={handleLinkClick}
+      >
         <img src={logo} alt="Logo" className="h-8" />
       </Link>
 
@@ -113,7 +146,8 @@ const DashSidebar = () => {
             <li key={item.path}>
               <Link
                 to={item.path}
-                className={`flex items-center bg-base-100 gap-3 px-3 py-2 rounded transition ${
+                onClick={handleLinkClick}
+                className={`flex items-center gap-3 px-3 py-2 rounded transition ${
                   location.pathname === item.path
                     ? "active bg-gradient"
                     : "hover:bg-blue-500"
@@ -134,7 +168,8 @@ const DashSidebar = () => {
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2 rounded bg-base-100 transition ${
+                  onClick={handleLinkClick}
+                  className={`flex items-center gap-3 px-3 py-2 rounded transition ${
                     location.pathname === item.path
                       ? "active bg-gradient"
                       : "hover:bg-blue-500"

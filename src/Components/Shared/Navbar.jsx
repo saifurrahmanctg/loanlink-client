@@ -18,6 +18,10 @@ import {
 import { TbLayoutDashboard } from "react-icons/tb";
 import logo from "../../assets/main-logo.png";
 import { useAuth } from "../../Provider/AuthProvider";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,8 +139,31 @@ export default function Navbar() {
 
   // Logout handler
   const handleLogout = async () => {
-    navigate("/", { replace: true });
-    await logOut();
+    const result = await MySwal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out from your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log me out!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        navigate("/", { replace: true });
+        await logOut();
+        MySwal.fire({
+          icon: "success",
+          title: "Logged out successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (err) {
+        MySwal.fire("Error", err.message, "error");
+      }
+    }
   };
 
   return (

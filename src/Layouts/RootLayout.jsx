@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../Components/Shared/Navbar";
-import { Outlet, useMatches, useNavigation, useParams } from "react-router";
+import {
+  Outlet,
+  useMatches,
+  useNavigation,
+  useParams,
+  useLocation,
+} from "react-router";
 import Footer from "../Components/Shared/Footer";
 import Loader from "../Components/Shared/Loader";
 
@@ -8,8 +14,10 @@ const RootLayout = () => {
   const navigation = useNavigation();
   const matches = useMatches();
   const params = useParams();
-  const [Loading, setLoading] = useState(false);
+  const location = useLocation(); // ✅ Needed for route change
+  const [loading, setLoading] = useState(true); // show loader initially
 
+  /* -------------------- Dynamic Document Title -------------------- */
   useEffect(() => {
     const match = matches.find(
       (m) => m.handle?.title || m.handle?.dynamicTitle
@@ -20,72 +28,56 @@ const RootLayout = () => {
       return;
     }
 
-    // ----------------------------------------
-    //        STATIC TITLES (normal pages)
-    // ----------------------------------------
     if (match.handle.title) {
       let title = match.handle.title;
-
-      // Replace dynamic params (:id, :slug, etc.)
       Object.keys(params).forEach((key) => {
         title = title.replace(`:${key}`, params[key]);
       });
-
       document.title = `${title} | LoanLink`;
       return;
     }
 
-    // ----------------------------------------
-    //        DYNAMIC LOAN TITLES
-    // ----------------------------------------
     if (match.handle.dynamicTitle) {
       const loan = match.data?.loan;
-
-      // choose routeTitle from handle if provided, otherwise fallback
       const routeTitle = match.handle.routeTitle || "Loan Details";
-
-      // Loan found → use loan title
       if (loan) {
         const loanTitle = loan.title || loan.loanTitle || loan.name || "Loan";
-
-        // Final format: Loan Title | <Route Title> | LoanLink
         document.title = `${loanTitle} | ${routeTitle} | LoanLink`;
       } else {
-        // still waiting for loader data
         document.title = `Loading Loan... | ${routeTitle} | LoanLink`;
       }
     }
   }, [matches, params]);
 
-  // Loader logic
+  /* -------------------- Route Change Loader -------------------- */
   useEffect(() => {
-    if (navigation.state === "loading") {
-      setLoading(true);
-    } else {
-      const timer = setTimeout(() => setLoading(false), 400);
-      return () => clearTimeout(timer);
-    }
-  }, [navigation.state]);
+    setLoading(true); // start loader on route change
+    const timer = setTimeout(() => setLoading(false), 800); // 1s minimum loader
+    return () => clearTimeout(timer);
+  }, [location.pathname]); // trigger on route change
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div>
+          {/* Navbar */}
+          <header className="sticky top-0 z-50">
+            <Navbar />
+          </header>
 
-      <main className="flex-grow relative">
-        {Loading && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm">
-            <Loader />
-          </div>
-        )}
+          {/* Main */}
+          <main className="flex-grow">
+            <Outlet />
+          </main>
 
-        <Outlet />
-      </main>
-
-      <footer>
-        <Footer />
-      </footer>
+          {/* Footer */}
+          <footer>
+            <Footer />
+          </footer>
+        </div>
+      )}
     </div>
   );
 };

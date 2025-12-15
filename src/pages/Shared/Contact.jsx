@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import PageHeader from "../../Components/Shared/PageHeader";
+import Swal from "sweetalert2";
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -22,10 +23,26 @@ export default function Contact() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log("Contact form:", data);
-    await new Promise((r) => setTimeout(r, 1200));
-    alert("Message sent (demo)");
-    reset();
+    try {
+      // demo delay
+      await new Promise((r) => setTimeout(r, 800));
+
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent!",
+        text: "Thank you for contacting us. We’ll get back to you shortly.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#16a34a",
+      });
+
+      reset();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Please try again later.",
+      });
+    }
   };
 
   return (
