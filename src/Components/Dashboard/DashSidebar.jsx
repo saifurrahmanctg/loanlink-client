@@ -11,7 +11,7 @@ import {
   FaPlusCircle,
 } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
-import { FiSettings, FiClock } from "react-icons/fi";
+import { FiSettings, FiClock, FiCheckCircle } from "react-icons/fi";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
 
@@ -51,6 +51,13 @@ const DashSidebar = () => {
       label: "Pending Loans",
       path: "/dashboard/pending-loans",
       icon: <FiClock />,
+      roles: ["manager"],
+    },
+
+    {
+      label: "Approved Loans",
+      path: "/dashboard/approved-loans",
+      icon: <FiCheckCircle />,
       roles: ["manager"],
     },
     // Dashboard Menu for Admin only

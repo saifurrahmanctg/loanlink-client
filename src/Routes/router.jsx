@@ -24,6 +24,7 @@ import ManageUsers from "../pages/Admin/ManageUsers";
 import AllAdminLoans from "../pages/Admin/AllAdminLoans";
 import ManageLoans from "../pages/Manager/ManageLoans";
 import PendingLoans from "../pages/Manager/PendingLoans";
+import ApprovedLoans from "../pages/Manager/ApprovedLoans";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -52,7 +53,6 @@ const router = createBrowserRouter([
 
       {
         path: "/loan-details/:id",
-        // important: provide a routeTitle so RootLayout can build full title
         handle: { dynamicTitle: true, routeTitle: "Loan Details" },
         element: <LoanDetails />,
         loader: async ({ params }) => {
@@ -66,7 +66,6 @@ const router = createBrowserRouter([
 
       {
         path: "/apply-loan/:id",
-        // also provide a routeTitle specific to this page
         handle: { dynamicTitle: true, routeTitle: "Apply Loan" },
         element: (
           <RoleRoute allowedRoles={["borrower"]}>
@@ -164,7 +163,16 @@ const router = createBrowserRouter([
             <PendingLoans />
           </RoleRoute>
         ),
-        handle: { title: "Add Loan" },
+        handle: { title: "Pending Loan" },
+      },
+      {
+        path: "approved-loans",
+        element: (
+          <RoleRoute allowedRoles={["manager"]}>
+            <ApprovedLoans />
+          </RoleRoute>
+        ),
+        handle: { title: "Approved Loan" },
       },
       // ==========================
       //        ADMIN PAGE
