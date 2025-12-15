@@ -133,6 +133,7 @@ export default function Navbar() {
     </motion.button>
   );
 
+  // Logout handler
   const handleLogout = async () => {
     navigate("/", { replace: true });
     await logOut();

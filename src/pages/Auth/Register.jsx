@@ -1,4 +1,3 @@
-/* Register.jsx */
 import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
@@ -9,32 +8,15 @@ import authImage from "../../assets/auth-image.jpg";
 import authBg from "../../assets/auth-bg.png";
 import authBgDark from "../../assets/auth-bg-dark.png";
 import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa6";
+import { FaGithub, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { BsUpload } from "react-icons/bs";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../../Provider/AuthProvider";
+import useTheme from "../../hooks/useTheme";
 
 const MySwal = withReactContent(Swal);
 
-/* ------------- tiny hook to read DaisyUI theme ------------- */
-const useDaisyTheme = () => {
-  const [theme, setTheme] = useState(
-    () => document.documentElement.getAttribute("data-theme") || "light"
-  );
-  useEffect(() => {
-    const observer = new MutationObserver(() =>
-      setTheme(document.documentElement.getAttribute("data-theme") || "light")
-    );
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-  return theme;
-};
-
-/* ------------- animation variants (unchanged) ------------- */
+/*  Animation variants  */
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i = 1) => ({
@@ -53,32 +35,30 @@ const floatVariants = {
 /* ------------- page component ------------- */
 export default function Register() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signUp, signInWithGoogle } = useAuth();
+  const { theme } = useTheme();
+
+  const bgImage = theme === "dark" ? authBgDark : authBg;
+
+  const [preview, setPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("borrower");
-  const roleOptions = [
-    { value: "borrower", label: "Borrower" },
-    { value: "manager", label: "Manager" },
-  ];
+
   const {
-    register: hookFormRegister,
+    register,
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm();
-  const { signUp, signInWithGoogle } = useAuth(); // ← Firebase hooks
-  const navigate = useNavigate();
 
-  const [preview, setPreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  /* 🎯 live theme */
-  const theme = useDaisyTheme();
-  const bgImage = theme === "dark" ? authBgDark : authBg;
-
-  /* ---------- imgBB upload (unchanged) ---------- */
+  /* ---------- imgBB upload ---------- */
   const uploadToImgBB = async (file) => {
     setUploading(true);
     const body = new FormData();
     body.append("image", file);
+
     try {
       const res = await fetch(
         `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`,
@@ -89,10 +69,10 @@ export default function Register() {
         setValue("photo", data.data.url);
         setPreview(data.data.url);
       } else {
-        MySwal.fire({ icon: "error", title: "Upload failed" });
+        MySwal.fire("Error", "Image upload failed", "error");
       }
     } catch {
-      MySwal.fire({ icon: "error", title: "Network error" });
+      MySwal.fire("Error", "Network error", "error");
     } finally {
       setUploading(false);
     }
@@ -105,13 +85,11 @@ export default function Register() {
     uploadToImgBB(file);
   };
 
-  /* ---------- Firebase register ---------- */
+  /* ---------- Register ---------- */
   const onSubmit = async ({ name, email, password, photo, role }) => {
     try {
-      // Firebase auth create user
       await signUp(email, password, name, photo, role);
 
-      // Save to MongoDB
       await fetch(`${import.meta.env.VITE_API_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -126,28 +104,22 @@ export default function Register() {
 
       MySwal.fire({
         icon: "success",
-        title: "Account created!",
-        text: "User saved in MongoDB successfully",
+        title: "Account created successfully!",
         timer: 2000,
         showConfirmButton: false,
       });
 
       navigate("/dashboard");
     } catch (err) {
-      MySwal.fire({
-        icon: "error",
-        title: "Registration failed",
-        text: err.message,
-      });
+      MySwal.fire("Error", err.message, "error");
     }
   };
 
-  /* ---------- Google register ---------- */
+  /* ---------- Google Register ---------- */
   const googleRegister = async () => {
     try {
       const user = await signInWithGoogle();
 
-      // Save to MongoDB
       await fetch(`${import.meta.env.VITE_API_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -155,7 +127,7 @@ export default function Register() {
           name: user.displayName || "No Name",
           email: user.email,
           photo: user.photoURL || "",
-          role: "borrower", // default role
+          role: "borrower",
           createdAt: new Date(),
         }),
       });
@@ -166,19 +138,16 @@ export default function Register() {
         timer: 2000,
         showConfirmButton: false,
       });
+
       navigate("/dashboard");
     } catch (err) {
-      MySwal.fire({
-        icon: "error",
-        title: "Google sign-up failed",
-        text: err.message,
-      });
+      MySwal.fire("Error", err.message, "error");
     }
   };
 
   return (
     <>
-      {/* PageHeader + animations (unchanged) */}
+      {/* Page Header */}
       <motion.div
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -214,7 +183,6 @@ export default function Register() {
             style={{
               backgroundImage: `url(${bgImage})`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
             }}
           >
             <motion.div
@@ -266,14 +234,9 @@ export default function Register() {
                 <motion.div custom={3} variants={fadeInVariants}>
                   <label className="block mb-1 font-semibold">Full Name</label>
                   <input
-                    type="text"
-                    placeholder="Your full name"
-                    className={`input input-bordered w-full rounded ${
-                      errors.name ? "input-error" : ""
-                    }`}
-                    {...hookFormRegister("name", {
-                      required: "Name is required",
-                    })}
+                    className="input input-bordered w-full"
+                    placeholder="Full Name"
+                    {...register("name", { required: "Name is required" })}
                   />
                   {errors.name && (
                     <p className="text-red-500 text-sm mt-1">
@@ -317,7 +280,7 @@ export default function Register() {
                     </div>
                     <input
                       type="hidden"
-                      {...hookFormRegister("photo", {
+                      {...register("photo", {
                         required: "Please upload a photo",
                       })}
                     />
@@ -335,15 +298,12 @@ export default function Register() {
                       className="select select-bordered w-full rounded"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      {...hookFormRegister("role", {
+                      {...register("role", {
                         required: "Please select a role",
                       })}
                     >
-                      {roleOptions.map((o) => (
-                        <option key={o.value} value={o.value}>
-                          {o.label}
-                        </option>
-                      ))}
+                      <option value="borrower">Borrower</option>
+                      <option value="manager">Manager</option>
                     </select>
                     {errors.role && (
                       <p className="text-red-500 text-sm mt-1">
@@ -362,7 +322,7 @@ export default function Register() {
                     className={`input input-bordered w-full rounded ${
                       errors.email ? "input-error" : ""
                     }`}
-                    {...hookFormRegister("email", {
+                    {...register("email", {
                       required: "Email is required",
                       pattern: {
                         value: /\S+@\S+\.\S+/,
@@ -380,20 +340,33 @@ export default function Register() {
                 {/* Password */}
                 <motion.div custom={6} variants={fadeInVariants}>
                   <label className="block mb-1 font-semibold">Password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    className={`input input-bordered w-full rounded ${
-                      errors.password ? "input-error" : ""
-                    }`}
-                    {...hookFormRegister("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters",
-                      },
-                    })}
-                  />
+
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className="input input-bordered w-full pr-14" // ✅ extra padding
+                      placeholder="Password"
+                      {...register("password", {
+                        required: "Password is required",
+                        pattern: {
+                          value: /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/,
+                          message:
+                            "Must contain uppercase, lowercase & minimum 6 characters",
+                        },
+                      })}
+                    />
+
+                    {/* Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-70 hover:opacity-100 z-10
+"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+
                   {errors.password && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.password.message}
@@ -422,19 +395,19 @@ export default function Register() {
               <motion.div
                 custom={9}
                 variants={fadeInVariants}
-                className="flex items-center gap-4 mt-4"
+                className="md:flex items-center gap-4 mt-4"
               >
                 <button
                   type="button"
                   onClick={googleRegister}
-                  className="flex-1 btn btn-outline btn-accent rounded normal-case"
+                  className="flex-1 btn btn-outline btn-accent rounded normal-case w-full"
                 >
                   <FcGoogle className="mr-2 text-xl" /> Sign up with Google
                 </button>
                 <button
                   type="button"
                   onClick={() => alert("GitHub sign-up (demo)")}
-                  className="flex-1 btn btn-outline rounded normal-case"
+                  className="flex-1 btn btn-outline rounded normal-case w-full mt-3 md:mt-0"
                 >
                   <FaGithub className="mr-2 text-xl" /> Sign up with GitHub
                 </button>

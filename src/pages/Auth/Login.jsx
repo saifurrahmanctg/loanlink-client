@@ -11,28 +11,12 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../Provider/AuthProvider";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import useTheme from "../../hooks/useTheme";
 
 const MySwal = withReactContent(Swal);
 
-/* ------------- tiny hook to read DaisyUI theme ------------- */
-const useDaisyTheme = () => {
-  const [theme, setTheme] = useState(
-    () => document.documentElement.getAttribute("data-theme") || "light"
-  );
-  useEffect(() => {
-    const observer = new MutationObserver(() =>
-      setTheme(document.documentElement.getAttribute("data-theme") || "light")
-    );
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-  return theme;
-};
-
-/* ---------- animation variants  ---------- */
+/* Animation variants */
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i = 1) => ({
@@ -50,6 +34,8 @@ const floatVariants = {
 
 /* ------------- page component ------------- */
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+  const { theme } = useTheme();
   const {
     register,
     handleSubmit,
@@ -58,16 +44,10 @@ export default function Login() {
   const { login, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useDaisyTheme();
+
   const bgImage = theme === "dark" ? authBgDark : authBg;
 
   const from = location.state?.from?.pathname || "/dashboard";
-
-  // Add this to debug
-  useEffect(() => {
-    console.log("Location state:", location);
-    console.log("From path:", from);
-  }, [location]);
 
   /* ---------- Email/Password login ---------- */
   const onSubmit = async ({ email, password }) => {
@@ -170,7 +150,6 @@ export default function Login() {
             style={{
               backgroundImage: `url(${bgImage})`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
             }}
           >
             <motion.div
@@ -246,20 +225,29 @@ export default function Login() {
                 {/* Password */}
                 <motion.div custom={4} variants={fadeInVariants}>
                   <label className="block mb-1 font-semibold">Password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    className={`input input-bordered w-full rounded ${
-                      errors.password ? "input-error" : ""
-                    }`}
-                    {...register("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters",
-                      },
-                    })}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      className={`input input-bordered w-full pr-14 ${
+                        errors.password ? "input-error" : ""
+                      }`}
+                      {...register("password", {
+                        required: "Password is required",
+                        minLength: {
+                          value: 6,
+                          message: "Password must be at least 6 characters",
+                        },
+                      })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-70 hover:opacity-100 z-10"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
                   {errors.password && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.password.message}

@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import DashSidebar from "./DashSidebar";
 import { Link, Outlet, useLocation } from "react-router";
 import { useAuth } from "../../Provider/AuthProvider";
 import logo from "../../assets/main-logo.png";
+import { IoMoon } from "react-icons/io5";
+import { MdSunny } from "react-icons/md";
 import DashFooter from "./DashFooter";
 import DashboardHeader from "../Dashboard/DashboardHeader";
 
@@ -14,7 +16,22 @@ const fadeIn = {
 
 const DashDrawer = () => {
   const { user } = useAuth();
+  const [theme, setTheme] = useState("light");
   const location = useLocation();
+
+  /* ---------- theme ---------- */
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") || "light";
+    setTheme(saved);
+    document.documentElement.setAttribute("data-theme", saved);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
 
   const menuItems = [
     { label: "Dashboard Home", path: "/dashboard" },
@@ -30,6 +47,28 @@ const DashDrawer = () => {
     { label: "Settings", path: "/dashboard/settings" },
   ];
 
+  /* ---------- theme button ---------- */
+  const ThemeButton = (
+    <motion.button
+      onClick={toggleTheme}
+      className="p-2 rounded-full bg-[#3BADE3] hover:bg-blue-600 transition"
+      whileTap={{ scale: 0.9 }}
+    >
+      <motion.div
+        initial={false}
+        animate={{ rotate: theme === "dark" ? 180 : 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {theme === "light" ? (
+          <IoMoon size={16} fill="white" />
+        ) : (
+          <MdSunny size={18} fill="white" />
+        )}
+      </motion.div>
+    </motion.button>
+  );
+
+  // User avatar
   const userPhoto = user?.photoURL || "?";
 
   const getUserInitial = () => {
@@ -91,7 +130,8 @@ const DashDrawer = () => {
               <img src={logo} alt="Logo" className="h-6 md:h-8 lg:h-10" />
             </Link>
           </div>
-          <div className="navbar-end">
+          <div className="navbar-end flex items-center gap-3">
+            {ThemeButton}
             <Link to="/dashboard/profile">
               {userPhoto && userPhoto !== "?" ? (
                 <img
