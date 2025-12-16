@@ -60,7 +60,7 @@ export default function AddLoan() {
         maxLoanLimit: Number(formData.maxLoanLimit),
         description: formData.description,
         availableEMIPlans: emiArray,
-        image: imageURL, // NOW we save the correct URL
+        image: imageURL,
         createdBy: user.email,
         showOnHome: false,
         createdAt: new Date(),
@@ -140,6 +140,7 @@ export default function AddLoan() {
             <label className="font-semibold">Interest (%)</label>
             <input
               type="number"
+              step="any"
               {...register("interest", { required: true })}
               className="input input-bordered w-full"
             />

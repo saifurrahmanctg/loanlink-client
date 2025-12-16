@@ -1,9 +1,8 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../Provider/AuthProvider";
-import { Link } from "react-router";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -231,217 +230,235 @@ export default function ManageLoans() {
           </p>
         </div>
 
-        {/* Search & Filter */}
-        <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
-          <input
-            type="text"
-            placeholder="Search loans by title or category..."
-            className="input input-bordered w-full md:w-1/3"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          <select
-            className="select select-bordered w-full md:w-1/4"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto bg-base-300 shadow-md rounded-xl">
-          <table className="table table-zebra">
-            <thead className="bg-green-300 text-green-800">
-              <tr>
-                <th>Image</th>
-                <th>Title</th>
-                <th>Interest</th>
-                <th>Category</th>
-                <th>Max Limit</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredLoans.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-6">
-                    No loans found for this filter.
-                  </td>
-                </tr>
-              ) : (
-                filteredLoans.map((loan) => (
-                  <tr
-                    key={loan._id}
-                    className="hover:bg-base-200 transition-all duration-150"
-                  >
-                    <td>
-                      <img
-                        src={loan.image}
-                        alt={loan.title}
-                        className="w-20 h-14 object-cover rounded"
-                      />
-                    </td>
-
-                    <td className="font-semibold">{loan.title}</td>
-
-                    <td>{loan.interest}%</td>
-
-                    <td>
-                      <span className="badge badge-info">{loan.category}</span>
-                    </td>
-
-                    <td>৳{Number(loan.maxLoanLimit).toLocaleString()}</td>
-
-                    <td>
-                      <div className="flex gap-2">
-                        <button
-                          className="btn btn-sm btn-info"
-                          onClick={() => openUpdateModal(loan)}
-                        >
-                          Update
-                        </button>
-
-                        <button
-                          className="btn btn-sm btn-error"
-                          onClick={() => handleDelete(loan)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Update Modal (manager edits allowed except showHome) */}
-        <dialog id="manageUpdateModal" className="modal">
-          <div className="modal-box w-11/12 max-w-3xl">
-            <h3 className="font-bold text-center font-rajdhani text-gradient text-2xl mb-4">
-              Update Loan
+        {isLoading ? (
+          <div className="flex justify-center items-center gap-3">
+            <span className="loading loading-spinner loading-xl text-info"></span>
+            <h3 className="text-gradient text-xl font-bold">
+              All Loans are Loading . . .
             </h3>
-
-            {selectedLoan ? (
-              <form onSubmit={handleUpdateSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InputField
-                    label="Title"
-                    value={selectedLoan.title}
-                    onChange={(v) =>
-                      setSelectedLoan((s) => ({ ...s, title: v }))
-                    }
-                  />
-
-                  <InputField
-                    label="Category"
-                    value={selectedLoan.category}
-                    onChange={(v) =>
-                      setSelectedLoan((s) => ({ ...s, category: v }))
-                    }
-                  />
-
-                  <InputField
-                    label="Interest (%)"
-                    value={selectedLoan.interest}
-                    onChange={(v) =>
-                      setSelectedLoan((s) => ({ ...s, interest: v }))
-                    }
-                    type="number"
-                  />
-
-                  <InputField
-                    label="Max Loan Limit"
-                    value={selectedLoan.maxLoanLimit}
-                    onChange={(v) =>
-                      setSelectedLoan((s) => ({ ...s, maxLoanLimit: v }))
-                    }
-                    type="number"
-                  />
-                </div>
-
-                <TextAreaField
-                  label="Description"
-                  value={selectedLoan.description}
-                  onChange={(v) =>
-                    setSelectedLoan((s) => ({ ...s, description: v }))
-                  }
-                />
-
-                <InputField
-                  label="Available EMI Plans (comma separated months)"
-                  value={selectedLoan.availableEMIPlansStr}
-                  onChange={(v) =>
-                    setSelectedLoan((s) => ({ ...s, availableEMIPlansStr: v }))
-                  }
-                  placeholder="e.g. 3,6,12"
-                />
-
-                {/* Image upload */}
-                <div className="flex gap-3 items-end">
-                  <div className="flex-1">
-                    <label className="font-semibold text-sm">Loan Image</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="file-input w-full mt-2"
-                      onChange={handleImageUpload}
-                    />
-                    {uploadingImage && (
-                      <p className="text-sm text-blue-500 mt-1">
-                        Uploading image...
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="preview"
-                        className="w-32 h-20 rounded-md object-cover"
-                      />
-                    ) : (
-                      <div className="w-32 h-20 rounded-md bg-base-200 flex items-center justify-center text-sm text-gray-400">
-                        No image
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="w-full flex gap-2">
-                  <button type="submit" className="btn bg-gradient w-1/2">
-                    Save Changes
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-outline w-1/2"
-                    onClick={() => {
-                      const modal =
-                        document.getElementById("manageUpdateModal");
-                      modal?.close();
-                      setSelectedLoan(null);
-                      setImagePreview(null);
-                    }}
-                  >
-                    Close
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <p>Loading...</p>
-            )}
           </div>
-        </dialog>
+        ) : (
+          <>
+            {/* Search & Filter */}
+            <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
+              <input
+                type="text"
+                placeholder="Search loans by title or category..."
+                className="input input-bordered w-full md:w-1/3"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+
+              <select
+                className="select select-bordered w-full md:w-1/4"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto bg-base-300 shadow-md rounded-xl">
+              <table className="table table-zebra">
+                <thead className="bg-green-300 text-green-800">
+                  <tr>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Interest</th>
+                    <th>Category</th>
+                    <th>Max Limit</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredLoans.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="text-center py-6">
+                        No loans found for this filter.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredLoans.map((loan) => (
+                      <tr
+                        key={loan._id}
+                        className="hover:bg-base-200 transition-all duration-150"
+                      >
+                        <td>
+                          <img
+                            src={loan.image}
+                            alt={loan.title}
+                            className="w-20 h-14 object-cover rounded"
+                          />
+                        </td>
+
+                        <td className="font-semibold">{loan.title}</td>
+
+                        <td>{loan.interest}%</td>
+
+                        <td>
+                          <span className="badge badge-info">
+                            {loan.category}
+                          </span>
+                        </td>
+
+                        <td>৳{Number(loan.maxLoanLimit).toLocaleString()}</td>
+
+                        <td>
+                          <div className="flex gap-2">
+                            <button
+                              className="btn btn-sm btn-info"
+                              onClick={() => openUpdateModal(loan)}
+                            >
+                              Update
+                            </button>
+
+                            <button
+                              className="btn btn-sm btn-error"
+                              onClick={() => handleDelete(loan)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Update Modal (manager edits allowed except showHome) */}
+            <dialog id="manageUpdateModal" className="modal">
+              <div className="modal-box w-11/12 max-w-3xl">
+                <h3 className="font-bold text-center font-rajdhani text-gradient text-2xl mb-4">
+                  Update Loan
+                </h3>
+
+                {selectedLoan ? (
+                  <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <InputField
+                        label="Title"
+                        value={selectedLoan.title}
+                        onChange={(v) =>
+                          setSelectedLoan((s) => ({ ...s, title: v }))
+                        }
+                      />
+
+                      <InputField
+                        label="Category"
+                        value={selectedLoan.category}
+                        onChange={(v) =>
+                          setSelectedLoan((s) => ({ ...s, category: v }))
+                        }
+                      />
+
+                      <InputField
+                        label="Interest (%)"
+                        value={selectedLoan.interest}
+                        onChange={(v) =>
+                          setSelectedLoan((s) => ({ ...s, interest: v }))
+                        }
+                        type="number"
+                      />
+
+                      <InputField
+                        label="Max Loan Limit"
+                        value={selectedLoan.maxLoanLimit}
+                        onChange={(v) =>
+                          setSelectedLoan((s) => ({ ...s, maxLoanLimit: v }))
+                        }
+                        type="number"
+                      />
+                    </div>
+
+                    <TextAreaField
+                      label="Description"
+                      value={selectedLoan.description}
+                      onChange={(v) =>
+                        setSelectedLoan((s) => ({ ...s, description: v }))
+                      }
+                    />
+
+                    <InputField
+                      label="Available EMI Plans (comma separated months)"
+                      value={selectedLoan.availableEMIPlansStr}
+                      onChange={(v) =>
+                        setSelectedLoan((s) => ({
+                          ...s,
+                          availableEMIPlansStr: v,
+                        }))
+                      }
+                      placeholder="e.g. 3,6,12"
+                    />
+
+                    {/* Image upload */}
+                    <div className="flex gap-3 items-end">
+                      <div className="flex-1">
+                        <label className="font-semibold text-sm">
+                          Loan Image
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="file-input w-full mt-2"
+                          onChange={handleImageUpload}
+                        />
+                        {uploadingImage && (
+                          <p className="text-sm text-blue-500 mt-1">
+                            Uploading image...
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        {imagePreview ? (
+                          <img
+                            src={imagePreview}
+                            alt="preview"
+                            className="w-32 h-20 rounded-md object-cover"
+                          />
+                        ) : (
+                          <div className="w-32 h-20 rounded-md bg-base-200 flex items-center justify-center text-sm text-gray-400">
+                            No image
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-full flex gap-2">
+                      <button type="submit" className="btn bg-gradient w-1/2">
+                        Save Changes
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline w-1/2"
+                        onClick={() => {
+                          const modal =
+                            document.getElementById("manageUpdateModal");
+                          modal?.close();
+                          setSelectedLoan(null);
+                          setImagePreview(null);
+                        }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <p>Loading...</p>
+                )}
+              </div>
+            </dialog>
+          </>
+        )}
       </motion.div>
     </section>
   );

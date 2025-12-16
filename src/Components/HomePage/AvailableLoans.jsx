@@ -22,8 +22,11 @@ export default function AvailableLoans() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-20">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="flex justify-center items-center gap-3">
+        <span className="loading loading-spinner loading-xl text-info"></span>
+        <h3 className="text-gradient text-xl font-bold">
+          All Available Loans are Loading . . .
+        </h3>
       </div>
     );
   }

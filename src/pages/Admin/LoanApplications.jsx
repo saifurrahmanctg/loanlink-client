@@ -26,9 +26,6 @@ export default function LoanApplications() {
 
   const [selectedApp, setSelectedApp] = useState(null);
 
-  if (isLoading)
-    return <p className="text-center py-20 text-gray-500">Loading...</p>;
-
   const filteredApps = applications;
 
   return (
@@ -49,202 +46,216 @@ export default function LoanApplications() {
           </p>
         </div>
 
-        {/* Filter */}
-        <div className="mb-6 flex gap-4 items-center">
-          <label className="font-medium">Filter by Status:</label>
-          <select
-            className="select select-bordered w-48"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        </div>
-
-        {/* No Data */}
-        {filteredApps.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
-            <FaInbox className="text-6xl mb-4 text-gray-400" />
-            <p className="text-xl font-semibold">
-              No applications found{filter ? ` for "${filter}"` : ""}.
-            </p>
-            <p className="text-gray-400 mt-2">
-              Try selecting a different filter or check back later.
-            </p>
+        {isLoading ? (
+          <div className="flex justify-center items-center gap-3">
+            <span className="loading loading-spinner loading-xl text-info"></span>
+            <h3 className="text-gradient text-xl font-bold">
+              All Loan Applications are Loading . . .
+            </h3>
           </div>
         ) : (
-          // Table
-          <div className="overflow-x-auto bg-base-200 shadow rounded-xl">
-            <table className="table table-zebra table-hover">
-              <thead className="bg-base-300">
-                <tr>
-                  <th>Loan ID</th>
-                  <th>User Details</th>
-                  <th>Loan Title</th>
-                  <th>Loan Amount</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
+          <>
+            {/* Filter */}
+            <div className="mb-6 flex gap-4 items-center">
+              <label className="font-medium">Filter by Status:</label>
+              <select
+                className="select select-bordered w-48"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <option value="">All</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
 
-              <tbody>
-                {filteredApps.map((app) => {
-                  const highlight =
-                    filter && app.status.toLowerCase() === filter.toLowerCase();
+            {/* No Data */}
+            {filteredApps.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
+                <FaInbox className="text-6xl mb-4 text-gray-400" />
+                <p className="text-xl font-semibold">
+                  No applications found{filter ? ` for "${filter}"` : ""}.
+                </p>
+                <p className="text-gray-400 mt-2">
+                  Try selecting a different filter or check back later.
+                </p>
+              </div>
+            ) : (
+              // Table
+              <div className="overflow-x-auto bg-base-200 shadow rounded-xl">
+                <table className="table table-zebra table-hover">
+                  <thead className="bg-base-300">
+                    <tr>
+                      <th>Loan ID</th>
+                      <th>User Details</th>
+                      <th>Loan Title</th>
+                      <th>Loan Amount</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
 
-                  return (
-                    <motion.tr
-                      key={app._id}
-                      className={`transition-all duration-300 cursor-pointer ${
-                        highlight
-                          ? "bg-green-100 hover:bg-green-200"
-                          : "hover:bg-base-300"
-                      }`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                  <tbody>
+                    {filteredApps.map((app) => {
+                      const highlight =
+                        filter &&
+                        app.status.toLowerCase() === filter.toLowerCase();
+
+                      return (
+                        <motion.tr
+                          key={app._id}
+                          className={`transition-all duration-300 cursor-pointer ${
+                            highlight
+                              ? "bg-green-100 hover:bg-green-200"
+                              : "hover:bg-base-300"
+                          }`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          <td>{app.loanId}</td>
+                          <td>
+                            <div>
+                              {app.firstName} {app.lastName}
+                            </div>
+                            <div>{app.userEmail}</div>
+                          </td>
+                          <td>{app.loanTitle}</td>
+                          <td>৳{Number(app.loanAmount).toLocaleString()}</td>
+                          <td>
+                            <div
+                              className={`badge ${
+                                app.status === "Pending"
+                                  ? "badge-warning"
+                                  : app.status === "Approved"
+                                  ? "badge-success"
+                                  : "badge-error"
+                              }`}
+                            >
+                              {app.status}
+                            </div>
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-sm bg-gradient hover:scale-105 transition-transform"
+                              onClick={() => setSelectedApp(app)}
+                            >
+                              View
+                            </button>
+                          </td>
+                        </motion.tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Modal */}
+            {selectedApp && (
+              <dialog
+                open
+                className="modal modal-open"
+                onClose={() => setSelectedApp(null)}
+              >
+                <div className="modal-box max-w-3xl bg-base-200">
+                  {/* Header */}
+                  <div className="text-center mb-8">
+                    <h2 className="font-rajdhani text-3xl font-bold mb-2">
+                      Loan Application{" "}
+                      <span className="text-gradient">Details</span>
+                    </h2>
+                    <p className="text-gray-600">
+                      See details of application #{selectedApp._id}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center mb-5">
+                    <h3 className="text-2xl font-bold text-blue-500 border-l-4 pl-2">
+                      {selectedApp.loanTitle}
+                    </h3>
+                    <button
+                      className="btn btn-sm btn-circle btn-ghost"
+                      onClick={() => setSelectedApp(null)}
                     >
-                      <td>{app.loanId}</td>
-                      <td>
-                        <div>
-                          {app.firstName} {app.lastName}
-                        </div>
-                        <div>{app.userEmail}</div>
-                      </td>
-                      <td>{app.loanTitle}</td>
-                      <td>৳{Number(app.loanAmount).toLocaleString()}</td>
-                      <td>
-                        <div
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <p>
+                        <strong>Name:</strong> {selectedApp.firstName}{" "}
+                        {selectedApp.lastName}
+                      </p>
+                      <p>
+                        <strong>Email:</strong> {selectedApp.userEmail}
+                      </p>
+                      <p>
+                        <strong>Contact:</strong> {selectedApp.contactNumber}
+                      </p>
+                      <p>
+                        <strong>NID / Passport:</strong>{" "}
+                        {selectedApp.nationalId}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p>
+                        <strong>Loan Amount:</strong> ৳
+                        {Number(selectedApp.loanAmount).toLocaleString()}
+                      </p>
+                      <p>
+                        <strong>Income:</strong> ৳
+                        {Number(selectedApp.monthlyIncome).toLocaleString()}
+                      </p>
+                      <p>
+                        <strong>Income Source:</strong>{" "}
+                        {selectedApp.incomeSource}
+                      </p>
+                      <p>
+                        <strong>Loan Status:</strong>{" "}
+                        <span
                           className={`badge ${
-                            app.status === "Pending"
+                            selectedApp.status === "Pending"
                               ? "badge-warning"
-                              : app.status === "Approved"
+                              : selectedApp.status === "Approved"
                               ? "badge-success"
                               : "badge-error"
                           }`}
                         >
-                          {app.status}
-                        </div>
-                      </td>
-                      <td>
-                        <button
-                          className="btn btn-sm bg-gradient hover:scale-105 transition-transform"
-                          onClick={() => setSelectedApp(app)}
-                        >
-                          View
-                        </button>
-                      </td>
-                    </motion.tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+                          {selectedApp.status}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
 
-        {/* Modal */}
-        {selectedApp && (
-          <dialog
-            open
-            className="modal modal-open"
-            onClose={() => setSelectedApp(null)}
-          >
-            <div className="modal-box max-w-3xl bg-base-200">
-              {/* Header */}
-              <div className="text-center mb-8">
-                <h2 className="font-rajdhani text-3xl font-bold mb-2">
-                  Loan Application{" "}
-                  <span className="text-gradient">Details</span>
-                </h2>
-                <p className="text-gray-600">
-                  See details of application #{selectedApp._id}
-                </p>
-              </div>
-              <div className="flex justify-between items-center mb-5">
-                <h3 className="text-2xl font-bold text-blue-500 border-l-4 pl-2">
-                  {selectedApp.loanTitle}
-                </h3>
-                <button
-                  className="btn btn-sm btn-circle btn-ghost"
-                  onClick={() => setSelectedApp(null)}
-                >
-                  ✕
-                </button>
-              </div>
+                  <div className="mb-4">
+                    <h4 className="font-semibold mb-1">Reason</h4>
+                    <p className="mb-2">{selectedApp.reason}</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <p>
-                    <strong>Name:</strong> {selectedApp.firstName}{" "}
-                    {selectedApp.lastName}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {selectedApp.userEmail}
-                  </p>
-                  <p>
-                    <strong>Contact:</strong> {selectedApp.contactNumber}
-                  </p>
-                  <p>
-                    <strong>NID / Passport:</strong> {selectedApp.nationalId}
-                  </p>
-                </div>
+                    <h4 className="font-semibold mb-1">Address</h4>
+                    <p>{selectedApp.address}</p>
 
-                <div>
-                  <p>
-                    <strong>Loan Amount:</strong> ৳
-                    {Number(selectedApp.loanAmount).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Income:</strong> ৳
-                    {Number(selectedApp.monthlyIncome).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Income Source:</strong> {selectedApp.incomeSource}
-                  </p>
-                  <p>
-                    <strong>Loan Status:</strong>{" "}
-                    <span
-                      className={`badge ${
-                        selectedApp.status === "Pending"
-                          ? "badge-warning"
-                          : selectedApp.status === "Approved"
-                          ? "badge-success"
-                          : "badge-error"
-                      }`}
+                    {selectedApp.notes && (
+                      <>
+                        <h4 className="font-semibold mb-1 mt-4">Notes</h4>
+                        <p>{selectedApp.notes}</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="modal-action">
+                    <button
+                      className="btn bg-gradient hover:scale-105 transition-transform"
+                      onClick={() => setSelectedApp(null)}
                     >
-                      {selectedApp.status}
-                    </span>
-                  </p>
+                      Close
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="mb-4">
-                <h4 className="font-semibold mb-1">Reason</h4>
-                <p className="mb-2">{selectedApp.reason}</p>
-
-                <h4 className="font-semibold mb-1">Address</h4>
-                <p>{selectedApp.address}</p>
-
-                {selectedApp.notes && (
-                  <>
-                    <h4 className="font-semibold mb-1 mt-4">Notes</h4>
-                    <p>{selectedApp.notes}</p>
-                  </>
-                )}
-              </div>
-
-              <div className="modal-action">
-                <button
-                  className="btn bg-gradient hover:scale-105 transition-transform"
-                  onClick={() => setSelectedApp(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </dialog>
+              </dialog>
+            )}
+          </>
         )}
       </motion.div>
     </section>

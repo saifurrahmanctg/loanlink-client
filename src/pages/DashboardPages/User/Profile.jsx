@@ -142,7 +142,7 @@ export default function Profile() {
           </motion.button>
           <motion.button
             onClick={handleLogout}
-            className="btn bg-red-500 hover:bg-red-700  text-white flex items-center justify-center gap-2"
+            className="btn bg-red-500 hover:bg-red-700 md:hidden text-white flex items-center justify-center gap-2"
           >
             <FaSignOutAlt /> Logout
           </motion.button>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLoaderData } from "react-router";
 import { FaSearch, FaFilter, FaTimes } from "react-icons/fa";
@@ -15,9 +15,16 @@ export default function AllLoans() {
   const [interestMax, setInterestMax] = useState(15);
   const [amountMax, setAmountMax] = useState(100000);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [loading, setLoading] = useState(true);
 
   /* ---------- loader data ---------- */
   const loanData = useLoaderData() || [];
+
+  useEffect(() => {
+    if (loanData) {
+      setLoading(false);
+    }
+  }, [loanData]);
 
   /* ---------- derived categories ---------- */
   const categories = useMemo(
@@ -84,188 +91,202 @@ export default function AllLoans() {
             </p>
           </motion.div>
 
-          {/* FILTER BAR */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="mb-8 grid md:grid-cols-2 gap-6 items-end"
-          >
-            {/* Search */}
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by title or category..."
-                className="input input-bordered w-full pl-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+          {loading ? (
+            <div className="flex justify-center items-center gap-3">
+              <span className="loading loading-spinner loading-xl text-info"></span>
+              <h3 className="text-gradient text-xl font-bold">
+                All Loans are Loading . . .
+              </h3>
             </div>
-
-            {/* Category + Clear */}
-            <div className="flex items-end gap-2">
-              <div className="flex-1">
-                <select
-                  className="select select-bordered w-full"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  {categories.map((c) => (
-                    <option key={c} value={c}>
-                      {c || "All categories"}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button
-                onClick={clearAll}
-                className="btn btn-ghost btn-square bg-gradient"
-                title="Clear all filters"
+          ) : (
+            <>
+              {/* FILTER BAR */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="mb-8 grid md:grid-cols-2 gap-6 items-end"
               >
-                <FaTimes />
-              </button>
-            </div>
+                {/* Search */}
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by title or category..."
+                    className="input input-bordered w-full pl-10"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
 
-            {/* Interest Slider */}
-            <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-2 py-1">
-              <label className="label">
-                <span className="text-gradient">Interest:</span>
-                <span className="label-text">5%</span>
-              </label>
-              <input
-                type="range"
-                min="5"
-                max="15"
-                step="0.5"
-                value={interestMax}
-                onChange={(e) => setInterestMax(Number(e.target.value))}
-                className="range range-accent range-sm w-full"
-              />
-              <label className="label">
-                <span className="label-text">{interestMax}%</span>
-              </label>
-            </div>
-
-            {/* Amount Slider */}
-            <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-2 py-1">
-              <label className="label">
-                <span className="text-gradient">Amount:</span>
-                <span className="label-text">৳ 5,000</span>
-              </label>
-              <input
-                type="range"
-                min="5000"
-                max="100000"
-                step="5000"
-                value={amountMax}
-                onChange={(e) => setAmountMax(Number(e.target.value))}
-                className="range range-accent range-sm w-full"
-              />
-              <label className="label">
-                <span className="label-text">
-                  ৳ {amountMax.toLocaleString()}
-                </span>
-              </label>
-            </div>
-          </motion.div>
-
-          {/* Results count */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="flex items-center justify-between mb-6"
-          >
-            <p className="text-sm text-gray-600">
-              Showing{" "}
-              <span className="font-semibold text-primary">
-                {filtered.length}
-              </span>{" "}
-              loan(s)
-            </p>
-
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <FaFilter className="text-primary" />
-              <span>
-                Active filters:{" "}
-                {[
-                  search && "Search",
-                  interestMax < 15 && "Interest",
-                  amountMax < 100000 && "Amount",
-                  selectedCategory && "Category",
-                ]
-                  .filter(Boolean)
-                  .join(", ") || "None"}
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Loan Cards */}
-          <AnimatePresence mode="popLayout">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((loan) => (
-                <motion.div
-                  key={loan._id}
-                  layout
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeUp}
-                  className="card bg-base-300 shadow hover:shadow-xl transition rounded-2xl overflow-hidden"
-                >
-                  <figure className="h-48 w-full">
-                    <img
-                      src={loan.image}
-                      alt={loan.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </figure>
-
-                  <div className="card-body p-4">
-                    <h3 className="card-title text-lg">{loan.title}</h3>
-                    <p className="text-sm text-gray-500 mb-1">
-                      {loan.category}
-                    </p>
-
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-primary font-semibold">
-                        {loan.interest}% interest
-                      </span>
-
-                      <span className="text-gray-600">
-                        Up to ৳{loan.maxLoanLimit?.toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className="card-actions mt-4">
-                      <Link
-                        to={`/loan-details/${loan._id}`}
-                        className="btn bg-gradient btn-sm btn-block"
-                      >
-                        View Details
-                      </Link>
-                    </div>
+                {/* Category + Clear */}
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <select
+                      className="select select-bordered w-full"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      {categories.map((c) => (
+                        <option key={c} value={c}>
+                          {c || "All categories"}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </AnimatePresence>
+                  <button
+                    onClick={clearAll}
+                    className="btn btn-ghost btn-square bg-gradient"
+                    title="Clear all filters"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
 
-          {/* Empty state */}
-          {filtered.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-10"
-            >
-              <p className="text-gray-500">No loans match your filters.</p>
-              <button onClick={clearAll} className="btn btn-link btn-sm mt-2">
-                Clear all filters
-              </button>
-            </motion.div>
+                {/* Interest Slider */}
+                <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-2 py-1">
+                  <label className="label">
+                    <span className="text-gradient">Interest:</span>
+                    <span className="label-text">5%</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="15"
+                    step="0.5"
+                    value={interestMax}
+                    onChange={(e) => setInterestMax(Number(e.target.value))}
+                    className="range range-accent range-sm w-full"
+                  />
+                  <label className="label">
+                    <span className="label-text">{interestMax}%</span>
+                  </label>
+                </div>
+
+                {/* Amount Slider */}
+                <div className="flex gap-3 justify-center items-center bg-base-300 rounded px-2 py-1">
+                  <label className="label">
+                    <span className="text-gradient">Amount:</span>
+                    <span className="label-text">৳ 5,000</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="5000"
+                    max="100000"
+                    step="5000"
+                    value={amountMax}
+                    onChange={(e) => setAmountMax(Number(e.target.value))}
+                    className="range range-accent range-sm w-full"
+                  />
+                  <label className="label">
+                    <span className="label-text">
+                      ৳ {amountMax.toLocaleString()}
+                    </span>
+                  </label>
+                </div>
+              </motion.div>
+
+              {/* Results count */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="flex items-center justify-between mb-6"
+              >
+                <p className="text-sm text-gray-600">
+                  Showing{" "}
+                  <span className="font-semibold text-primary">
+                    {filtered.length}
+                  </span>{" "}
+                  loan(s)
+                </p>
+
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <FaFilter className="text-primary" />
+                  <span>
+                    Active filters:{" "}
+                    {[
+                      search && "Search",
+                      interestMax < 15 && "Interest",
+                      amountMax < 100000 && "Amount",
+                      selectedCategory && "Category",
+                    ]
+                      .filter(Boolean)
+                      .join(", ") || "None"}
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Loan Cards */}
+              <AnimatePresence mode="popLayout">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filtered.map((loan) => (
+                    <motion.div
+                      key={loan._id}
+                      layout
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      variants={fadeUp}
+                      className="card bg-base-300 shadow hover:shadow-xl transition rounded-2xl overflow-hidden"
+                    >
+                      <figure className="h-48 w-full">
+                        <img
+                          src={loan.image}
+                          alt={loan.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </figure>
+
+                      <div className="card-body p-4">
+                        <h3 className="card-title text-lg">{loan.title}</h3>
+                        <p className="text-sm text-gray-500 mb-1">
+                          {loan.category}
+                        </p>
+
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-primary font-semibold">
+                            {loan.interest}% interest
+                          </span>
+
+                          <span className="text-gray-600">
+                            Up to ৳{loan.maxLoanLimit?.toLocaleString()}
+                          </span>
+                        </div>
+
+                        <div className="card-actions mt-4">
+                          <Link
+                            to={`/loan-details/${loan._id}`}
+                            className="btn bg-gradient btn-sm btn-block"
+                          >
+                            View Details
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </AnimatePresence>
+
+              {/* Empty state */}
+              {filtered.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-10"
+                >
+                  <p className="text-gray-500">No loans match your filters.</p>
+                  <button
+                    onClick={clearAll}
+                    className="btn btn-link btn-sm mt-2"
+                  >
+                    Clear all filters
+                  </button>
+                </motion.div>
+              )}
+            </>
           )}
         </div>
       </section>

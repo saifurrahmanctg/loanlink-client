@@ -169,7 +169,12 @@ export default function ManageUsers() {
         </div>
 
         {loading ? (
-          <p className="text-center">Loading users...</p>
+          <div className="flex justify-center items-center gap-3">
+            <span className="loading loading-spinner loading-xl text-info"></span>
+            <h3 className="text-gradient text-xl font-bold">
+              Users Data are Loading . . .
+            </h3>
+          </div>
         ) : (
           <div className="overflow-x-auto bg-base-200 shadow rounded-xl">
             <table className="table table-zebra">

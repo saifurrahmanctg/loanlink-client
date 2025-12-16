@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useLoaderData, useParams } from "react-router";
+import { useLoaderData, useNavigate, useParams } from "react-router";
 import PageHeader from "../Components/Shared/PageHeader";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
@@ -18,8 +18,8 @@ const API = import.meta.env.VITE_API_URL;
 export default function ApplyLoan() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
-
-  const { loan } = useLoaderData(); // ⬅ loader returns { loan }
+  const navigate = useNavigate();
+  const { loan } = useLoaderData();
   const { id } = useParams();
   const { user } = useAuth();
 
@@ -105,13 +105,15 @@ export default function ApplyLoan() {
     onSuccess: () => {
       setShowConfetti(true);
       runSideConfetti();
-      setAlreadyApplied(true); // disable further submissions
+      setAlreadyApplied(true);
 
       Swal.fire({
         icon: "success",
         title: "Application Submitted!",
         text: "Your loan application has been successfully submitted.",
         confirmButtonColor: "#3b82f6",
+      }).then(() => {
+        navigate("/dashboard/my-loans");
       });
 
       reset({

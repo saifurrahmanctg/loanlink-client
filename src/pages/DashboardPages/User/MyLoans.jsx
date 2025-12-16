@@ -21,7 +21,7 @@ export default function MyLoans() {
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedPayment, setSelectedPayment] = useState(null);
 
-  /* ---------------- Fetch User Loan Applications ---------------- */
+  /* Fetch User Loan Applications */
   const {
     data: applications = [],
     refetch,
@@ -72,7 +72,7 @@ export default function MyLoans() {
     refetch();
   };
 
-  /* ---------------- Delete Loan Application ---------------- */
+  /*  Delete Loan Application  */
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       const res = await fetch(`${API}/loan-applications/${id}`, {
@@ -112,7 +112,7 @@ export default function MyLoans() {
     });
   };
 
-  /* ---------------- Filtered Results ---------------- */
+  /*  Filtered Results  */
   const filteredLoans = applications.filter((loan) => {
     const matchSearch = loan.loanTitle
       .toLowerCase()
@@ -299,7 +299,7 @@ export default function MyLoans() {
               className="modal-box bg-green-200 shadow-xl rounded-2xl backdrop-blur-lg w-11/12 max-w-3xl max-h-[85vh] overflow-y-auto"
             >
               <h3 className="font-rajdhani text-3xl font-bold text-gradient text-center mb-6">
-                Loan Details
+                Loan Application Details
               </h3>
 
               {/* Details Grid */}
@@ -382,7 +382,9 @@ export default function MyLoans() {
         {selectedPayment && (
           <dialog className="modal" open>
             <div className="modal-box">
-              <h3 className="font-bold text-xl mb-4">Payment Details</h3>
+              <h3 className="font-bold text-xl text-gradient text-center mb-4">
+                Payment Details
+              </h3>
 
               <p>
                 <b>Email:</b> {selectedPayment.email}
@@ -418,8 +420,8 @@ export default function MyLoans() {
 
 /* Reusable Detail Component */
 const Detail = ({ label, value }) => (
-  <div className="p-3 rounded-xl border bg-white/60 shadow-sm">
+  <div className="p-3 rounded-xl bg-base-100 shadow-sm">
     <p className="text-xs font-semibold text-gray-500">{label}</p>
-    <p className="text-base font-medium mt-1">{value}</p>
+    <p className="text-green-500 font-medium mt-1">{value}</p>
   </div>
 );

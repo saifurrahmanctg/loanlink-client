@@ -109,7 +109,7 @@ export default function Register() {
         showConfirmButton: false,
       });
 
-      navigate("/dashboard");
+      navigate("/");
     } catch (err) {
       MySwal.fire("Error", err.message, "error");
     }
@@ -139,7 +139,7 @@ export default function Register() {
         showConfirmButton: false,
       });
 
-      navigate("/dashboard");
+      navigate("/");
     } catch (err) {
       MySwal.fire("Error", err.message, "error");
     }

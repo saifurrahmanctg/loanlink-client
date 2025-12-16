@@ -62,7 +62,7 @@ export default function Login() {
           name: user.displayName || "No Name",
           email: user.email,
           photo: user.photoURL || "",
-          role: "borrower", // default
+          role: "borrower",
           createdAt: new Date(),
         }),
       });

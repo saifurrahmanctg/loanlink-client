@@ -40,7 +40,7 @@ export default function ApprovedLoans() {
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="font-rajdhani text-3xl font-bold mb-2">
-            Approved <span className="text-gradient">Loans</span>
+            Approved <span className="text-gradient">Loan Applications</span>
           </h2>
           <p className="text-gray-600">
             All loan applications that have been approved
@@ -49,7 +49,12 @@ export default function ApprovedLoans() {
 
         {/* Loading / Empty */}
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center gap-3">
+            <span className="loading loading-spinner loading-xl text-info"></span>
+            <h3 className="text-gradient text-xl font-bold">
+              Approved Loan Applications are Loading . . .
+            </h3>
+          </div>
         ) : loans.length === 0 ? (
           <div className="text-center p-10 bg-base-200 rounded-xl">
             <h2 className="text-xl font-semibold">No Approved Loans Found</h2>

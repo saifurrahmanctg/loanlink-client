@@ -15,10 +15,11 @@ export default function DashboardChart() {
   const { user } = useAuth();
   const [stats, setStats] = useState([]);
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user?.email) return;
-
+    setLoading(true);
     const fetchStats = async () => {
       try {
         const res = await fetch(
@@ -31,6 +32,8 @@ export default function DashboardChart() {
         }
       } catch (err) {
         console.error("Failed to fetch stats:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -49,23 +52,31 @@ export default function DashboardChart() {
         <h2 className="font-rajdhani text-3xl font-bold mb-6 text-center">
           Dashboard <span className="text-gradient">Stats Chart</span>
         </h2>
-        <p className="text-gray-500 text-center mb-8">Role: {role}</p>
 
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart
-            data={chartData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip
-              formatter={(value) => new Intl.NumberFormat().format(value)}
-            />
-            <Legend />
-            <Bar dataKey="value" fill="#3B82F6" barSize={40} />
-          </BarChart>
-        </ResponsiveContainer>
+        {loading ? (
+          <div className="flex justify-center items-center gap-3">
+            <span className="loading loading-spinner loading-xl text-info"></span>
+            <h3 className="text-gradient text-xl font-bold">
+              Dashboard Chart is Loading . . .
+            </h3>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip
+                formatter={(value) => new Intl.NumberFormat().format(value)}
+              />
+              <Legend />
+              <Bar dataKey="value" fill="#3B82F6" barSize={40} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </section>
   );
