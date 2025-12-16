@@ -25,6 +25,7 @@ import AllAdminLoans from "../pages/Admin/AllAdminLoans";
 import ManageLoans from "../pages/Manager/ManageLoans";
 import PendingLoans from "../pages/Manager/PendingLoans";
 import ApprovedLoans from "../pages/Manager/ApprovedLoans";
+import PaymentSuccess from "../pages/DashboardPages/Payments/PaymentSuccess";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
     handle: { title: "Access Denied" },
     element: <AccessDenied />,
   },
+  {
+    path: "/payment-success",
+    element: <PaymentSuccess />,
+  },
   // ==========================
   //      DASHBOARD LAYOUT
   // ==========================
@@ -135,6 +140,7 @@ const router = createBrowserRouter([
         ),
         handle: { title: "My Loans" },
       },
+
       // ==========================
       //        MANAGER PAGES
       // ==========================

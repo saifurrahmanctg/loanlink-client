@@ -19,6 +19,7 @@ export default function MyLoans() {
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [selectedPayment, setSelectedPayment] = useState(null);
 
   /* ---------------- Fetch User Loan Applications ---------------- */
   const {
@@ -33,6 +34,43 @@ export default function MyLoans() {
     },
     enabled: !!user,
   });
+
+  // Payment handler
+  const handlePay = async (app) => {
+    console.log("PAY CLICKED", app);
+
+    const res = await fetch(`${API}/payments/create-checkout-session`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        loanApplicationId: app._id,
+        email: user.email,
+      }),
+    });
+
+    const data = await res.json();
+    window.location.href = data.url;
+  };
+
+  // Cancel handler
+  const handleCancel = async (app) => {
+    const result = await Swal.fire({
+      title: "Cancel Loan?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel it",
+    });
+
+    if (!result.isConfirmed) return;
+
+    await fetch(`${API}/loan-applications/cancel/${app._id}`, {
+      method: "PATCH",
+    });
+
+    Swal.fire("Cancelled!", "Loan has been cancelled.", "success");
+    refetch();
+  };
 
   /* ---------------- Delete Loan Application ---------------- */
   const deleteMutation = useMutation({
@@ -189,6 +227,7 @@ export default function MyLoans() {
 
                     <td>
                       <div className="flex gap-2">
+                        {/* View */}
                         <button
                           className="btn btn-sm btn-info text-white"
                           onClick={() => setSelectedLoan(app)}
@@ -196,6 +235,40 @@ export default function MyLoans() {
                           View
                         </button>
 
+                        {/* Cancel (Only Pending) */}
+
+                        <button
+                          disabled={app.status !== "Pending"}
+                          onClick={() => handleCancel(app)}
+                          className="btn btn-sm btn-warning text-white"
+                        >
+                          Cancel
+                        </button>
+
+                        {/* Pay / Paid */}
+                        {app.applicationFeeStatus === "Unpaid" ? (
+                          <button
+                            onClick={() => handlePay(app)}
+                            className="btn btn-sm btn-primary text-white"
+                          >
+                            Pay
+                          </button>
+                        ) : (
+                          <button
+                            onClick={async () => {
+                              const res = await fetch(
+                                `${API}/payments/${app._id}`
+                              );
+                              const data = await res.json();
+                              setSelectedPayment(data);
+                            }}
+                            className="btn btn-sm btn-success"
+                          >
+                            Paid
+                          </button>
+                        )}
+
+                        {/* Delete */}
                         <button
                           disabled={app.applicationFeeStatus === "Paid"}
                           onClick={() => handleDelete(app)}
@@ -207,17 +280,6 @@ export default function MyLoans() {
                         >
                           Delete
                         </button>
-
-                        {app.applicationFeeStatus === "Paid" ? (
-                          <div className="badge badge-success">Paid</div>
-                        ) : (
-                          <Link
-                            to={`/dashboard/pay-fee/${app._id}`}
-                            className="btn btn-sm btn-primary text-white"
-                          >
-                            Pay
-                          </Link>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -314,6 +376,39 @@ export default function MyLoans() {
                 </button>
               </div>
             </motion.div>
+          </dialog>
+        )}
+
+        {selectedPayment && (
+          <dialog className="modal" open>
+            <div className="modal-box">
+              <h3 className="font-bold text-xl mb-4">Payment Details</h3>
+
+              <p>
+                <b>Email:</b> {selectedPayment.email}
+              </p>
+              <p>
+                <b>Transaction ID:</b> {selectedPayment.transactionId}
+              </p>
+              <p>
+                <b>Loan ID:</b> {selectedPayment.loanApplicationId}
+              </p>
+              <p>
+                <b>Amount:</b> $10
+              </p>
+              <p>
+                <b>Date:</b> {new Date(selectedPayment.paidAt).toLocaleString()}
+              </p>
+
+              <div className="modal-action">
+                <button
+                  className="btn"
+                  onClick={() => setSelectedPayment(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </dialog>
         )}
       </motion.div>
