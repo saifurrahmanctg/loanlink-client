@@ -2,6 +2,8 @@
 
 A modern, responsive **Micro-Loan Management System** built with **React**, designed to serve **Admins, Managers, and Borrowers** with role-based dashboards, analytics, and smooth UI interactions.
 
+🔗 Live Demo: https://loanlink-client.web.app/
+
 ---
 
 ## 🖥️ Tech Stack
